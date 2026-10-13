@@ -1,0 +1,33 @@
+{
+  "step1": {
+    "verified": true,
+    "status": "COMPLETE",
+    "transaction": "0x671a9b056418de973f981c521299bec4e69d946fc9d0b2f515f8dfd58e338b85",
+    "block": "8419292"
+  },
+  "step2": {
+    "verified": true,
+    "ready": false,
+    "status": "COMPLETE",
+    "transaction": "0x2ad4aa32c27551c0dbe1795e94dd1b49bb1caf01b9e67e978a8c16912a2ef148",
+    "block": "8425736",
+    "transactionIndex": 1,
+    "logIndex": 0,
+    "resultingSubjectBalance": "15000000000000000000000",
+    "breachEstablished": true
+  },
+  "step3": {
+    "verified": true,
+    "ready": false,
+    "status": "COMPLETE",
+    "transaction": "0x55db69e114e157a891ed361be741eefd41c1eb139f1d56d58908d4f2dc4404f0",
+    "block": "8433798",
+    "transactionIndex": 1,
+    "logIndex": 0,
+    "finalSubjectBalance": "100000000000000000000000",
+    "finalHelperBalance": "0",
+    "restored": true,
+    "historicalMinimum": "15000000000000000000000",
+    "breachRemainsEstablished": true
+  }
+}

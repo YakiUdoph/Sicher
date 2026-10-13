@@ -1,0 +1,17 @@
+{
+  "step1": {
+    "verified": true,
+    "transaction": "0x91db23265c455265dd384deb96613266d12939417ef1992b39c1f35eecb4b621",
+    "block": "8128179"
+  },
+  "step2": {
+    "verified": false,
+    "transaction": null,
+    "block": null
+  },
+  "step3": {
+    "verified": false,
+    "transaction": null,
+    "block": null
+  }
+}

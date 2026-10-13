@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https:; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+    />
+    <title>Sicher Test Token Deployment</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main>
+      <section>
+        <h1>Sicher Test Token (STEST)</h1>
+        <p class="warning">Temporary testnet infrastructure—not $SICHER. Review every MetaMask field.</p>
+        <dl>
+          <dt>Required network</dt><dd>Elysium Testnet — chain ID 99801</dd>
+          <dt>Required wallet</dt><dd><code id="required-wallet">Loading…</code></dd>
+          <dt>Connected wallet</dt><dd><code id="connected-wallet">Not connected</code></dd>
+          <dt>Fixed initial supply</dt><dd id="supply">Loading…</dd>
+          <dt>Constructor</dt><dd id="constructor">Loading…</dd>
+          <dt>Constructor arguments</dt><dd>NONE</dd>
+          <dt>Creation bytecode SHA-256</dt><dd><code id="fingerprint">Loading…</code></dd>
+          <dt>Estimated gas</dt><dd id="gas">Unavailable until connected</dd>
+          <dt>Status</dt><dd id="status">Waiting for explicit wallet connection.</dd>
+        </dl>
+        <p>
+          <button id="connect" type="button">Connect MetaMask</button>
+          <button id="deploy" type="button" disabled>Deploy STEST via MetaMask</button>
+        </p>
+      </section>
+    </main>
+    <script type="module" src="./token-app.js"></script>
+  </body>
+</html>

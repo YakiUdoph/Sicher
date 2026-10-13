@@ -1,0 +1,181 @@
+{
+  "contractName": "SicherCommitmentProof",
+  "sourceName": "contracts/SicherCommitmentProof.sol",
+  "compilerVersion": "0.8.37+commit.f401782d.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "InvalidBlockWindow",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroMinimumBalance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroSubject",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroToken",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "creator",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "subject",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "minimumBalance",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "startBlock",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "endBlock",
+          "type": "uint256"
+        }
+      ],
+      "name": "CommitmentCreated",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "commitments",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "creator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "subject",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minimumBalance",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startBlock",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "endBlock",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "subject",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minimumBalance",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startBlock",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "endBlock",
+          "type": "uint256"
+        }
+      ],
+      "name": "createCommitment",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextCommitmentId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405260015f553480156012575f5ffd5b5061039f806100205f395ff3fe608060405234801561000f575f5ffd5b506004361061003f575f3560e01c806304b0ac931461004357806349ce8997146100695780635ac48e6d14610104575b5f5ffd5b6100566100513660046102e5565b61010c565b6040519081526020015b60405180910390f35b6100c061007736600461032e565b600160208190525f918252604090912080549181015460028201546003830154600484015460058501546006909501546001600160a01b03948516959385169490921692909187565b604080519788526001600160a01b03968716602089015294861694870194909452939091166060850152608084015260a083019190915260c082015260e001610060565b6100565f5481565b5f6001600160a01b03861661013457604051638782a30760e01b815260040160405180910390fd5b6001600160a01b03851661015b5760405163ad1991f560e01b815260040160405180910390fd5b835f0361017b5760405163f95f2df560e01b815260040160405180910390fd5b82821161019b57604051638b76a8ad60e01b815260040160405180910390fd5b5f805490806101a983610345565b909155506040805160e0810182528281523360208083018281526001600160a01b038c81168587018181528d831660608801908152608088018e815260a089018e815260c08a018e81525f8d81526001998a90528c90209a518b559651978a0180549887166001600160a01b0319998a16179055925160028a018054918716918916919091179055905160038901805491909516961695909517909255925160048601555160058501555160069093019290925591519293509183907f17346086b720c6cda5663c1e9da7d5c79c42bd0efc818425a3f848c10188201d906102b9908a908a908a908a906001600160a01b0394909416845260208401929092526040830152606082015260800190565b60405180910390a495945050505050565b80356001600160a01b03811681146102e0575f5ffd5b919050565b5f5f5f5f5f60a086880312156102f9575f5ffd5b610302866102ca565b9450610310602087016102ca565b94979496505050506040830135926060810135926080909101359150565b5f6020828403121561033e575f5ffd5b5035919050565b5f6001820161036257634e487b7160e01b5f52601160045260245ffd5b506001019056fea26469706673582212201936cd885425ee4d8721c08c820d24b9bcea587c55b6adeea25221b552741e8164736f6c63430008250033",
+  "deployedBytecode": "0x608060405234801561000f575f5ffd5b506004361061003f575f3560e01c806304b0ac931461004357806349ce8997146100695780635ac48e6d14610104575b5f5ffd5b6100566100513660046102e5565b61010c565b6040519081526020015b60405180910390f35b6100c061007736600461032e565b600160208190525f918252604090912080549181015460028201546003830154600484015460058501546006909501546001600160a01b03948516959385169490921692909187565b604080519788526001600160a01b03968716602089015294861694870194909452939091166060850152608084015260a083019190915260c082015260e001610060565b6100565f5481565b5f6001600160a01b03861661013457604051638782a30760e01b815260040160405180910390fd5b6001600160a01b03851661015b5760405163ad1991f560e01b815260040160405180910390fd5b835f0361017b5760405163f95f2df560e01b815260040160405180910390fd5b82821161019b57604051638b76a8ad60e01b815260040160405180910390fd5b5f805490806101a983610345565b909155506040805160e0810182528281523360208083018281526001600160a01b038c81168587018181528d831660608801908152608088018e815260a089018e815260c08a018e81525f8d81526001998a90528c90209a518b559651978a0180549887166001600160a01b0319998a16179055925160028a018054918716918916919091179055905160038901805491909516961695909517909255925160048601555160058501555160069093019290925591519293509183907f17346086b720c6cda5663c1e9da7d5c79c42bd0efc818425a3f848c10188201d906102b9908a908a908a908a906001600160a01b0394909416845260208401929092526040830152606082015260800190565b60405180910390a495945050505050565b80356001600160a01b03811681146102e0575f5ffd5b919050565b5f5f5f5f5f60a086880312156102f9575f5ffd5b610302866102ca565b9450610310602087016102ca565b94979496505050506040830135926060810135926080909101359150565b5f6020828403121561033e575f5ffd5b5035919050565b5f6001820161036257634e487b7160e01b5f52601160045260245ffd5b506001019056fea26469706673582212201936cd885425ee4d8721c08c820d24b9bcea587c55b6adeea25221b552741e8164736f6c63430008250033",
+  "bytecodeSizeBytes": 959,
+  "runtimeBytecodeSizeBytes": 927
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "sicher.phase5.final-evidence-manifest/1.0",
+  "recordedAt": "2026-10-13",
+  "receipts": {
+    "machine": {
+      "path": "evidence/phase5-commitment2-final-receipt.json",
+      "sha256": "9c9e35da5f55b8af4733bd865b897471cdeca488257793e8c01cff13d09beb61"
+    },
+    "human": {
+      "path": "evidence/phase5-commitment2-final-receipt.txt",
+      "sha256": "2f9853ffa5696626f481d49a1c9c9ac46f47dc3e2101ed36f84c911011690829"
+    }
+  },
+  "frozenCode": {
+    "historicalVerifier": {
+      "path": "scripts/historical-min-balance-verifier.ts",
+      "sha256": "d3d82e32f3b9fe56fa7627b597e4efb48ec31a7f5b22bc61964e0227f13737ba"
+    },
+    "reconstructionCore": {
+      "path": "scripts/min-balance-core.ts",
+      "sha256": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a"
+    },
+    "commitment2Finalizer": {
+      "path": "scripts/finalize-commitment2.ts",
+      "sha256": "b6ec36bc2df543271263f51aa974900648d4c23ef4f6da8330567fdd0e647764"
+    },
+    "returnHelperSource": {
+      "path": "contracts/SicherTestReturnHelper.sol",
+      "sha256": "c6b86382059949072b0e6c07d4cc855500d52392ab00ba1142609ed535ec423d"
+    }
+  },
+  "integrity": "All fingerprints were recomputed from the existing frozen files. This manifest references them and does not modify either receipt or Phase 5 code."
+}

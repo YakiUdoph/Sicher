@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "experiment": "Sicher Elysium MIN_BALANCE failure path",
+  "network": {
+    "name": "Elysium Testnet",
+    "chainId": 99801
+  },
+  "contracts": {
+    "sicherCommitmentProof": "0x4e4887e28a8370678a9a37c08a85c65450b510c0",
+    "stest": "0x14fc373dce148766a3b8d9c2bf5f02f8dbe316a7",
+    "returnHelper": "0x9A39b6B2D458212b3f0d3247C98130b2192068D0"
+  },
+  "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+  "setupSink": "0x000000000000000000000000000000000000dEaD",
+  "terms": {
+    "minimumBalance": "80000000000000000000000",
+    "startBlock": "8126584",
+    "endBlock": "8141584",
+    "interval": "inclusive"
+  },
+  "commitment": {
+    "id": "1",
+    "creationTransaction": "0x2acc22906a63f3a36df84f9f8070e9c0923c9e846eabb60911873a9c4a1b83a9",
+    "creationBlock": "8121733",
+    "verification": {
+      "pass": 26,
+      "fail": 0,
+      "indeterminate": 0,
+      "verdict": "PASS"
+    }
+  },
+  "setup": {
+    "amount": "900000000000000000000000",
+    "transaction": "0x77e9247f84e4bc22a69ba466548cf7b952e762d1705c47a5c04f743e2b2f768a",
+    "block": "8110482",
+    "verifiedSubjectBalance": "100000000000000000000000",
+    "verification": {
+      "pass": 17,
+      "fail": 0,
+      "indeterminate": 0,
+      "verdict": "PASS"
+    }
+  },
+  "returnHelperDeployment": {
+    "address": "0x9A39b6B2D458212b3f0d3247C98130b2192068D0",
+    "transaction": "0xf0325f3072798fa16e73673401124b483bde74e635ebe98c26df1f339eb89a55",
+    "block": "6965908",
+    "verification": {
+      "pass": 15,
+      "fail": 0,
+      "indeterminate": 0,
+      "verdict": "PASS"
+    }
+  },
+  "experimentTransfers": [
+    {
+      "sequence": 1,
+      "amount": "8000000000000000000000",
+      "direction": "subject-to-helper",
+      "transaction": "0x91db23265c455265dd384deb96613266d12939417ef1992b39c1f35eecb4b621",
+      "block": "8128179",
+      "verification": {
+        "pass": 17,
+        "fail": 0,
+        "indeterminate": 0,
+        "verdict": "PASS"
+      }
+    },
+    {
+      "sequence": 2,
+      "amount": "77000000000000000000000",
+      "direction": "subject-to-helper",
+      "transaction": null,
+      "block": null
+    },
+    {
+      "sequence": 3,
+      "amount": "85000000000000000000000",
+      "direction": "helper-to-subject",
+      "transaction": null,
+      "block": null
+    }
+  ],
+  "evidence": {
+    "startingBalanceBlock": null,
+    "startingBalance": null,
+    "relevantTransferLogs": [],
+    "reconstructedBalances": [],
+    "minimumObservedBalance": null,
+    "minimumCausingTransaction": null,
+    "minimumCausingLogIndex": null,
+    "finalBalance": null,
+    "verdict": "PENDING"
+  },
+  "verifier": {
+    "path": "scripts/historical-min-balance-verifier.ts",
+    "version": "phase5a-1",
+    "fingerprintSha256": "7487fcbaa39107a618b97606bbfffa3a6da60913498495d703bd0a82e1ca3f3b",
+    "reconstructionCoreFingerprintSha256": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a"
+  }
+}

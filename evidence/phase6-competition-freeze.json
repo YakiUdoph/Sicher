@@ -1,0 +1,108 @@
+{
+  "freezeVersion": "sicher.competition-verifier-freeze/1.0",
+  "timestamp": "2026-10-13T18:16:31-01:00",
+  "chainId": "99801",
+  "registryAddress": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+  "tokenModelBoundary": {
+    "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+    "symbol": "STEST",
+    "supported": "Conventional ERC-20 balance accounting represented exactly by standard Transfer events",
+    "excluded": [
+      "rebasing",
+      "arbitrary fee-on-transfer behavior",
+      "hidden balance mutation",
+      "other non-conventional accounting"
+    ]
+  },
+  "assurancePolicy": {
+    "default": "CORROBORATED",
+    "optional": "EXHAUSTIVE",
+    "proofResultIsSeparateFromAssuranceLevel": true
+  },
+  "receiptSchemaVersion": "sicher.competition-receipt/3.0",
+  "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
+  "combinedCoreFingerprint": "2c7ed9c6624db964a247d28c327afc9a4633a6699e2d9d05ad35cf21859649a6",
+  "criticalFileFingerprints": {
+    "scripts/phase6-registry-verifier.ts": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
+    "scripts/phase6-evidence-core.ts": "de9b950d7520b3b9a6826e8966fb05e0b64d54f87ad6132aef2fa4e19dd1b95d",
+    "scripts/phase6-assurance-core.ts": "6fc058dd9bf05d02e077e02be62210d47b054a2665231027bdbce51cfb17d9b1",
+    "scripts/phase6-evidence-cache.ts": "68ca8fb6aaa39858c248b592bcca745aa88dc0ce4cd28444dc342ed9644c365d",
+    "scripts/phase6-crosscheck-phase5.ts": "8143112b4405929dde02a883677f9cdc857fb6cde268292a655530f3b3a87909",
+    "test/Phase6EvidenceVerifier.test.ts": "057289d4c08469717bf8b5eaacd993c0fada87060b5f52f8796cefa5a1ad91f0",
+    "test/Phase6RedTeam.test.ts": "4d554f62fc5cfb9938a62c3e91bcccc77faeb1303485192190ee5bae9018949e",
+    "test/Phase6B1Regression.test.ts": "da8ae84815bcb8a14ba580199d4e12360696c5f2129125da8737b2807eec690f",
+    "test/Phase6B2ScalableAssurance.test.ts": "46954879b7d8310ebfeee41ae2f1350b06e11e45b635ee3bccc2b2f318a7f6ee",
+    "docs/THREAT_MODEL.md": "5030753de9962ac2c3bca02002931328a95c141ac7774a5eecdcd1bddb16d9b8",
+    "docs/COMPETITION_ASSURANCE_POLICY.md": "6578fc4b061e18ab4e62339836c286b45c4cf0d9f7b804dcf5a59de77af7e7b4",
+    "docs/PHASE6_CLAIMS_BOUNDARY.md": "b989ae56c87d02c5b37380ef3504863af4b808c6788137998dae2bea0a10d931",
+    "docs/FRONTEND_INTEGRATION_CONTRACT.md": "9ccbd9bb8565222cf2753690be48124527c5a5bede26a26762cbe6c371ff5873"
+  },
+  "phase5FrozenFingerprints": {
+    "evidence/phase5-commitment2-final-receipt.json": "9c9e35da5f55b8af4733bd865b897471cdeca488257793e8c01cff13d09beb61",
+    "evidence/phase5-commitment2-final-receipt.txt": "2f9853ffa5696626f481d49a1c9c9ac46f47dc3e2101ed36f84c911011690829",
+    "scripts/historical-min-balance-verifier.ts": "d3d82e32f3b9fe56fa7627b597e4efb48ec31a7f5b22bc61964e0227f13737ba",
+    "scripts/min-balance-core.ts": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a",
+    "scripts/finalize-commitment2.ts": "b6ec36bc2df543271263f51aa974900648d4c23ef4f6da8330567fdd0e647764",
+    "contracts/SicherTestReturnHelper.sol": "c6b86382059949072b0e6c07d4cc855500d52392ab00ba1142609ed535ec423d"
+  },
+  "testResults": {
+    "tests": 207,
+    "passed": 207,
+    "failed": 0,
+    "skipped": 0,
+    "typecheck": "PASS"
+  },
+  "commitment1": {
+    "commitmentId": "1",
+    "proofResult": "PROVEN",
+    "assuranceLevel": "CORROBORATED",
+    "receiptDigest": "2b1fa85d2dbd00729218bbe09d327cfc2349f20df02921185d8a2ec3c43fbece",
+    "artifact": "evidence/phase6b2-commitment1-receipt-v3.json",
+    "cleanReproduction": "MATCH"
+  },
+  "commitment2": {
+    "commitmentId": "2",
+    "proofResult": "NOT_PROVEN",
+    "assuranceLevel": "CORROBORATED",
+    "receiptDigest": "bd8e5cfa63ff862d4e0b1efc93c6ae2ac0800b01b6806a5ea5146880ce1b67f7",
+    "artifact": "evidence/phase6b2-commitment2-receipt-v3.json",
+    "cleanReproduction": "SEMANTIC_MATCH_WITH_LATER_FINALIZED_HEAD"
+  },
+  "phase5CrossCheck": {
+    "status": "PASS",
+    "agreement": true,
+    "mismatchCount": 0,
+    "artifact": "evidence/phase6b2-phase5-phase6-crosscheck.json"
+  },
+  "finalityPolicy": {
+    "tag": "finalized",
+    "configuredOperatorsMustAgreeOnHeadNumberAndHash": true,
+    "endBlockMustNotExceedAgreedFinalizedHead": true,
+    "consequentialHistoricalBlockHashesPinned": true
+  },
+  "providerModel": {
+    "operators": [
+      "Hypedexer",
+      "Conduit"
+    ],
+    "separatelyOperated": true,
+    "sharedUpstreamDependenciesDisclosed": true
+  },
+  "knownCriticalImplementationDefects": 0,
+  "knownHighImplementationDefects": 0,
+  "acceptedArchitecturalLimitations": [
+    "Correlated omission across configured operators and shared upstream infrastructure cannot be mathematically excluded.",
+    "Targeted transaction-receipt checks authenticate discovered events but do not prove that no undiscovered event was omitted.",
+    "Start/end balances and sparse checkpoints do not prove absence of an omitted temporary breach.",
+    "The two competition receipts are CORROBORATED and do not claim full-window EXHAUSTIVE verification.",
+    "Receipt digests are local tamper-evidence, not signatures or immutable anchors.",
+    "The review does not establish correctness for unsupported token accounting, arbitrary networks, broad production operation, or malicious shared infrastructure."
+  ],
+  "phase5FrozenFilesUnchanged": true,
+  "receiptV3Validation": "PASS",
+  "temporaryTamperTest": "REJECTED_AS_EXPECTED",
+  "transactionsSentDuringReview": 0,
+  "freezeInvalidationRule": "Any competition-critical file change invalidates this freeze until the complete Phase 6C gate is rerun and a new manifest is issued.",
+  "canonicalization": "Recursive lexicographic JSON object-key ordering; array order preserved; UTF-8 JSON; SHA-256 over the canonical string",
+  "freezeStatus": "FROZEN"
+}

@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-10-13T00:53:14.881Z",
+  "ready": true,
+  "commitmentId": "2",
+  "currentBlock": "8168507",
+  "freshHelper": "0x266bcaac497BaE5450B7aD3721376B3081DEc63c",
+  "unexpectedTransfers": 0,
+  "hypeBalanceWei": "99834241800000000",
+  "cadence": {
+    "observationSeconds": 18.983,
+    "observationStartBlock": "8168429",
+    "observationEndBlock": "8168507",
+    "observedBlocks": "78",
+    "liveSecondsPerBlock": 0.243,
+    "historicalFirstBlock": "8168447",
+    "historicalLastBlock": "8168507",
+    "historicalIntervals": 60,
+    "historicalAverageSecondsPerBlock": 0.133,
+    "historicalMedianSecondsPerBlock": 0,
+    "historicalMinimumSecondsPerBlock": 0,
+    "historicalMaximumSecondsPerBlock": 1,
+    "designSecondsPerBlock": 0.243
+  },
+  "policy": {
+    "startDelayBlocks": "50000",
+    "proofWindowBlocks": "300000",
+    "minimumRemainingDelayBlocks": "40000"
+  },
+  "proposal": {
+    "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+    "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+    "minimumBalance": "80000000000000000000000",
+    "startBlock": "8218507",
+    "endBlock": "8518507"
+  },
+  "costs": {
+    "createGas": "188952",
+    "step1Gas": "51826",
+    "step2Gas": "51838",
+    "restoreBaselineGas": "55304",
+    "conservativeGasMultiplierPercent": 150,
+    "conservativeFeeRateWei": "180000000",
+    "estimatedTotalWei": "93938400000000",
+    "safetyReserveWei": "99740303400000000",
+    "requiredCoverageMultiple": 10
+  }
+}

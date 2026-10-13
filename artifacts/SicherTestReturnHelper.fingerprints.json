@@ -1,0 +1,8 @@
+{
+  "algorithm": "sha256",
+  "helperSourceSha256": "c6b86382059949072b0e6c07d4cc855500d52392ab00ba1142609ed535ec423d",
+  "helperCreationBytecodeSha256": "1460903f5b2e31057042cb3bbc1d877cc43dc0378d2aaf3699c5f8e560b15562",
+  "helperRuntimeBytecodeSha256": "95ca1edfa1ee823b3668353e0818a31faf6934be729991c92ae5d1ffec0e60c8",
+  "historicalVerifierSha256": "7487fcbaa39107a618b97606bbfffa3a6da60913498495d703bd0a82e1ca3f3b",
+  "reconstructionCoreSha256": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a"
+}

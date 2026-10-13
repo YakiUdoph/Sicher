@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-13",
+  "status": "REMEDIATED_NOT_FROZEN",
+  "phase6SourceFingerprintsSha256": {
+    "scripts/phase6-evidence-core.ts": "de9b950d7520b3b9a6826e8966fb05e0b64d54f87ad6132aef2fa4e19dd1b95d",
+    "scripts/phase6-registry-verifier.ts": "65f9e834f89520ac583bea7972b6c307ef1d642ea2db49bd04bda373002bab75"
+  },
+  "phase5IntegritySha256": {
+    "scripts/historical-min-balance-verifier.ts": "d3d82e32f3b9fe56fa7627b597e4efb48ec31a7f5b22bc61964e0227f13737ba",
+    "scripts/min-balance-core.ts": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a",
+    "scripts/finalize-commitment2.ts": "b6ec36bc2df543271263f51aa974900648d4c23ef4f6da8330567fdd0e647764"
+  },
+  "tests": {
+    "baseline": { "passed": 50, "failed": 0 },
+    "previousRedTeam": { "passed": 35, "failed": 0 },
+    "newRegression": { "passed": 25, "failed": 0 },
+    "phase6Total": { "passed": 110, "failed": 0 },
+    "repositoryTotal": { "passed": 183, "failed": 0 },
+    "typecheck": "PASS"
+  },
+  "liveReadOnlyControls": {
+    "commitment1": {
+      "windowStatus": "COMPLETE",
+      "breachStatus": "NOT_OBSERVED",
+      "evidenceStatus": "INCOMPLETE",
+      "finalityStatus": "FINALIZED",
+      "finalVerdict": "INDETERMINATE",
+      "receiptScanBlocks": 15001,
+      "receiptScanRequestsIssued": 0
+    },
+    "commitment2": {
+      "windowStatus": "COMPLETE",
+      "breachStatus": "OBSERVED",
+      "evidenceStatus": "INCOMPLETE",
+      "finalityStatus": "FINALIZED",
+      "finalVerdict": "INDETERMINATE",
+      "receiptScanBlocks": 300001,
+      "receiptScanRequestsIssued": 0
+    }
+  },
+  "transactionsSent": 0,
+  "competitionVerifierFrozen": false
+}

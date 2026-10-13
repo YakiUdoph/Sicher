@@ -1,0 +1,63 @@
+{
+  "schema": "sicher.min-balance.receipt/1.0",
+  "verifier": {
+    "version": "sicher-phase5-commitment2-finalizer/1.0.0",
+    "finalizerSha256": "b6ec36bc2df543271263f51aa974900648d4c23ef4f6da8330567fdd0e647764",
+    "historicalVerifierSha256": "d3d82e32f3b9fe56fa7627b597e4efb48ec31a7f5b22bc61964e0227f13737ba",
+    "reconstructionCoreSha256": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a"
+  },
+  "chainId": 99801,
+  "registry": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+  "commitmentId": "2",
+  "creator": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+  "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+  "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+  "proofType": "MIN_BALANCE",
+  "minimumRequired": "80000000000000000000000",
+  "startBlock": "8220689",
+  "endBlock": "8520689",
+  "verificationBlock": "8608517",
+  "startingBalance": "100000000000000000000000",
+  "minimumObserved": "15000000000000000000000",
+  "minimumCausingBlock": "8425736",
+  "minimumCausingTransactionHash": "0x2ad4aa32c27551c0dbe1795e94dd1b49bb1caf01b9e67e978a8c16912a2ef148",
+  "minimumCausingTransactionIndex": 1,
+  "minimumCausingLogIndex": 0,
+  "finalReconstructedBalance": "100000000000000000000000",
+  "finalVerdict": "NOT_PROVEN",
+  "reason": "A complete immutable-window history contains a verified subject balance of 15,000 STEST, below the required 80,000 STEST minimum; later restoration does not erase the historical breach.",
+  "relevantOrderedEvidence": [
+    {
+      "blockNumber": "8419292",
+      "transactionIndex": 2,
+      "logIndex": 0,
+      "transactionHash": "0x671a9b056418de973f981c521299bec4e69d946fc9d0b2f515f8dfd58e338b85",
+      "from": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "to": "0x266bcaac497BaE5450B7aD3721376B3081DEc63c",
+      "amount": "8000000000000000000000"
+    },
+    {
+      "blockNumber": "8425736",
+      "transactionIndex": 1,
+      "logIndex": 0,
+      "transactionHash": "0x2ad4aa32c27551c0dbe1795e94dd1b49bb1caf01b9e67e978a8c16912a2ef148",
+      "from": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "to": "0x266bcaac497BaE5450B7aD3721376B3081DEc63c",
+      "amount": "77000000000000000000000"
+    },
+    {
+      "blockNumber": "8433798",
+      "transactionIndex": 1,
+      "logIndex": 0,
+      "transactionHash": "0x55db69e114e157a891ed361be741eefd41c1eb139f1d56d58908d4f2dc4404f0",
+      "from": "0x266bcaac497BaE5450B7aD3721376B3081DEc63c",
+      "to": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "amount": "85000000000000000000000"
+    }
+  ],
+  "evidenceCompleteness": {
+    "status": "COMPLETE",
+    "interval": "8220689-8520689",
+    "unexplainedRelevantTransfers": 0
+  }
+}

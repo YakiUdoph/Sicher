@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-13",
+  "status": "PASS_RECOMMEND_FREEZE_REVIEW_NOT_FROZEN",
+  "phase5Integrity": {
+    "machineReceiptSha256": "9c9e35da5f55b8af4733bd865b897471cdeca488257793e8c01cff13d09beb61",
+    "humanReceiptSha256": "2f9853ffa5696626f481d49a1c9c9ac46f47dc3e2101ed36f84c911011690829",
+    "historicalVerifierSha256": "d3d82e32f3b9fe56fa7627b597e4efb48ec31a7f5b22bc61964e0227f13737ba",
+    "reconstructionCoreSha256": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a",
+    "commitment2FinalizerSha256": "b6ec36bc2df543271263f51aa974900648d4c23ef4f6da8330567fdd0e647764",
+    "returnHelperSourceSha256": "c6b86382059949072b0e6c07d4cc855500d52392ab00ba1142609ed535ec423d"
+  },
+  "phase6": {
+    "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
+    "combinedCoreFingerprint": "2c7ed9c6624db964a247d28c327afc9a4633a6699e2d9d05ad35cf21859649a6",
+    "testsBefore": 183,
+    "testsAdded": 24,
+    "testsPassed": 207,
+    "testsFailed": 0,
+    "typecheck": "PASS"
+  },
+  "commitment1": {
+    "proofResult": "PROVEN",
+    "assuranceLevel": "CORROBORATED",
+    "chunks": 8,
+    "rpcAttempts": 40,
+    "retries": 0,
+    "evidenceCount": 1,
+    "targetedReceiptChecks": 2,
+    "elapsedMs": 11887,
+    "receiptDigest": "2b1fa85d2dbd00729218bbe09d327cfc2349f20df02921185d8a2ec3c43fbece"
+  },
+  "commitment2": {
+    "proofResult": "NOT_PROVEN",
+    "assuranceLevel": "CORROBORATED",
+    "chunks": 32,
+    "rpcAttempts": 92,
+    "retries": 0,
+    "evidenceCount": 3,
+    "targetedReceiptChecks": 6,
+    "elapsedMs": 24172,
+    "receiptDigest": "bd8e5cfa63ff862d4e0b1efc93c6ae2ac0800b01b6806a5ea5146880ce1b67f7",
+    "phase5Agreement": true,
+    "phase5Mismatches": []
+  },
+  "knownCriticalImplementationDefectsInsideDeclaredThreatModel": 0,
+  "knownHighImplementationDefectsInsideDeclaredThreatModel": 0,
+  "competitionVerifierFrozen": false,
+  "transactionsSent": 0
+}

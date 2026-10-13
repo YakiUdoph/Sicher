@@ -1,0 +1,11 @@
+{
+  "verified": true,
+  "verdict": "PASS",
+  "deploymentTransaction": "0x27de730fbc6301ff16b3ce7ce3ae9dde2a1064908f5e17e6470535ce63030d6a",
+  "deploymentBlock": "8160233",
+  "address": "0x266bcaac497BaE5450B7aD3721376B3081DEc63c",
+  "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+  "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+  "returnAmount": "85000000000000000000000",
+  "constructorSpecializedRuntimeSha256": "c2723a034950101f61e4bae13e75c3008774b650c003a2d87ad042561de4c98c"
+}

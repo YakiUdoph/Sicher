@@ -1,0 +1,25 @@
+{
+  "schema": "sicher.finalization-candidate/1.0",
+  "verifierVersion": "sicher-phase5-commitment2-finalizer/1.0.0",
+  "inclusiveWindowSemantics": "startBlock <= evidence block <= endBlock; terminal evaluation when currentBlock >= endBlock",
+  "historicalVerifier": {
+    "path": "scripts/historical-min-balance-verifier.ts",
+    "sha256": "d3d82e32f3b9fe56fa7627b597e4efb48ec31a7f5b22bc61964e0227f13737ba"
+  },
+  "reconstructionCore": {
+    "path": "scripts/min-balance-core.ts",
+    "sha256": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a"
+  },
+  "finalizer": {
+    "path": "scripts/finalize-commitment2.ts",
+    "sha256": "b6ec36bc2df543271263f51aa974900648d4c23ef4f6da8330567fdd0e647764"
+  },
+  "adversarialTests": {
+    "command": "npm.cmd run test:min-balance",
+    "expectedTests": 22
+  },
+  "receiptPaths": {
+    "machine": "evidence/phase5-commitment2-final-receipt.json",
+    "human": "evidence/phase5-commitment2-final-receipt.txt"
+  }
+}

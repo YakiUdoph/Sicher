@@ -1,0 +1,10 @@
+{
+  "verified": true,
+  "transaction": "0x4f2869ea1b45f34675e5fb5bc0de65ed3a914d5064859858ff13ee898070e7a0",
+  "creationBlock": "8170794",
+  "id": "2",
+  "startBlock": "8220689",
+  "endBlock": "8520689",
+  "minimumBalance": "80000000000000000000000",
+  "proofStatus": "ACTIVE_UNDETERMINED"
+}

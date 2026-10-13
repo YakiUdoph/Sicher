@@ -1,0 +1,25 @@
+SICHER COMMITMENT #2 FINAL RECEIPT
+Schema: sicher.min-balance.receipt/1.0
+Verifier: sicher-phase5-commitment2-finalizer/1.0.0
+Chain ID: 99801
+Registry: 0x4e4887E28a8370678A9a37C08A85c65450b510c0
+Commitment ID: 2
+Subject: 0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086
+Token: 0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7
+Proof type: MIN_BALANCE
+Window: 8220689 <= block <= 8520689
+Starting balance: 100000000000000000000000
+Required minimum: 80000000000000000000000
+Minimum observed: 15000000000000000000000
+Minimum-causing block: 8425736
+Minimum-causing transaction: 0x2ad4aa32c27551c0dbe1795e94dd1b49bb1caf01b9e67e978a8c16912a2ef148
+Minimum-causing transactionIndex: 1
+Minimum-causing logIndex: 0
+Final reconstructed balance: 100000000000000000000000
+Evidence completeness: COMPLETE
+Final verdict: NOT_PROVEN
+Reason: A complete immutable-window history contains a verified subject balance of 15,000 STEST, below the required 80,000 STEST minimum; later restoration does not erase the historical breach.
+Relevant ordered evidence:
+1. block=8419292 txIndex=2 logIndex=0 tx=0x671a9b056418de973f981c521299bec4e69d946fc9d0b2f515f8dfd58e338b85 from=0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086 to=0x266bcaac497BaE5450B7aD3721376B3081DEc63c amount=8000000000000000000000
+2. block=8425736 txIndex=1 logIndex=0 tx=0x2ad4aa32c27551c0dbe1795e94dd1b49bb1caf01b9e67e978a8c16912a2ef148 from=0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086 to=0x266bcaac497BaE5450B7aD3721376B3081DEc63c amount=77000000000000000000000
+3. block=8433798 txIndex=1 logIndex=0 tx=0x55db69e114e157a891ed361be741eefd41c1eb139f1d56d58908d4f2dc4404f0 from=0x266bcaac497BaE5450B7aD3721376B3081DEc63c to=0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086 amount=85000000000000000000000

@@ -1,0 +1,9 @@
+{
+  "verified": true,
+  "verdict": "PASS",
+  "startBlock": "8126584",
+  "endBlock": "8141584",
+  "minimumBalance": "80000000000000000000000",
+  "minimumObserved": "92000000000000000000000",
+  "finalBalance": "92000000000000000000000"
+}

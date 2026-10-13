@@ -1,0 +1,258 @@
+{
+  "evidenceManifest": {
+    "schema": "sicher.phase6.evidence-manifest/1.0",
+    "chainId": "99801",
+    "registry": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+    "commitmentId": "2",
+    "evaluatedInterval": {
+      "fromBlock": "8220689",
+      "toBlock": "8457058"
+    },
+    "providers": [
+      {
+        "id": "hypedexer",
+        "endpoint": "https://elysium-testnet-rpc.hypedexer.com"
+      },
+      {
+        "id": "kinetiq",
+        "endpoint": "https://testnet-rpc.elysium.kinetiq.xyz"
+      }
+    ],
+    "providerIndependenceVerified": false,
+    "ranges": [
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8220689",
+        "toBlock": "8240688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8240689",
+        "toBlock": "8260688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8260689",
+        "toBlock": "8280688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8280689",
+        "toBlock": "8300688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8300689",
+        "toBlock": "8320688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8320689",
+        "toBlock": "8340688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8340689",
+        "toBlock": "8360688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8360689",
+        "toBlock": "8380688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8380689",
+        "toBlock": "8400688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8400689",
+        "toBlock": "8420688",
+        "status": "SUCCESS",
+        "logCount": 1,
+        "digest": "7b3ca263434f378ae3df9bd5b528d13191246f58ef5900f8a8d7f8a8f21471a4"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8420689",
+        "toBlock": "8440688",
+        "status": "SUCCESS",
+        "logCount": 2,
+        "digest": "4f9dc76a8a0326dc99e9d50f901b8dcb30b8e466d03632b71665d7ae51cf5d63"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8440689",
+        "toBlock": "8457058",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8220689",
+        "toBlock": "8240688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8240689",
+        "toBlock": "8260688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8260689",
+        "toBlock": "8280688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8280689",
+        "toBlock": "8300688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8300689",
+        "toBlock": "8320688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8320689",
+        "toBlock": "8340688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8340689",
+        "toBlock": "8360688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8360689",
+        "toBlock": "8380688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8380689",
+        "toBlock": "8400688",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8400689",
+        "toBlock": "8420688",
+        "status": "SUCCESS",
+        "logCount": 1,
+        "digest": "7b3ca263434f378ae3df9bd5b528d13191246f58ef5900f8a8d7f8a8f21471a4"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8420689",
+        "toBlock": "8440688",
+        "status": "SUCCESS",
+        "logCount": 2,
+        "digest": "4f9dc76a8a0326dc99e9d50f901b8dcb30b8e466d03632b71665d7ae51cf5d63"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8440689",
+        "toBlock": "8457058",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    ],
+    "coverageComplete": true,
+    "consensus": true
+  },
+  "verificationRecord": {
+    "schema": "sicher.phase6.verification-record/1.0",
+    "canonicalSerialization": "RFC8785-inspired lexicographic JSON keys; BigInt encoded as base-10 strings; UTF-8; receiptDigest omitted while hashing",
+    "verifierFingerprint": "4942a3bb463733ce581d9c2c7013e5c2dcee9d129456a2c681e7446255cedb97",
+    "evidenceManifestDigest": "a7c532f9b8f6c514a46847d3c60f4903b7ae36c48e025dbc6d13b3756e6bfb3c",
+    "payload": {
+      "verifierVersion": "sicher-phase6-registry-verifier/1.0.0",
+      "chainId": "99801",
+      "registry": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+      "commitmentId": "2",
+      "creator": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+      "minimumBalance": "80000000000000000000000",
+      "startBlock": "8220689",
+      "endBlock": "8520689",
+      "currentBlock": "8457058",
+      "registryBound": true,
+      "evidenceRedundancy": "MULTI_PROVIDER",
+      "evidenceConsensus": true,
+      "providerIndependenceVerified": false,
+      "finalityPolicyVerified": false,
+      "confirmationDepth": "0",
+      "tokenModelStatus": "CONVENTIONAL_ERC20_TRANSFER_V1",
+      "windowStatus": "ACTIVE",
+      "breachStatus": "OBSERVED",
+      "finalVerdict": "PENDING",
+      "path": [
+        "100000000000000000000000",
+        "92000000000000000000000",
+        "15000000000000000000000",
+        "100000000000000000000000"
+      ],
+      "minimumObserved": "15000000000000000000000",
+      "finalBalance": "100000000000000000000000",
+      "reason": "Historical breach observed, but the commitment window is active."
+    },
+    "receiptDigest": "7fe455bf1043c6d069979dc0ee813bf0e47e5cec1dbcf29d41d3e46be40f4268"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "benchmark": "bounded-read-only",
+  "date": "2026-10-13",
+  "sample": {
+    "startBlock": "8128175",
+    "endBlock": "8128184",
+    "blocksPerProvider": 10,
+    "validation": "eth_getBlockReceipts count matched eth_getBlockByNumber transaction enumeration for every sampled block"
+  },
+  "providers": [
+    {
+      "id": "hypedexer",
+      "blocksSucceeded": 10,
+      "rpcRequests": 20,
+      "receipts": 26,
+      "elapsedMs": 4193,
+      "rateLimits": 0,
+      "archiveSampleAvailable": true,
+      "blockReceiptsSupported": true,
+      "fullBlockEnumerationSupported": true
+    },
+    {
+      "id": "kinetiq",
+      "blocksSucceeded": 10,
+      "rpcRequests": 20,
+      "receipts": 26,
+      "elapsedMs": 6476,
+      "rateLimits": 0,
+      "archiveSampleAvailable": true,
+      "blockReceiptsSupported": true,
+      "fullBlockEnumerationSupported": true
+    }
+  ],
+  "feasibility": {
+    "blockReceiptBatching": "All receipts for one block are returned by one call; no multi-block receipt RPC was established.",
+    "requestsPerBlockAcrossTwoProviders": 4,
+    "commitment1Blocks": 15001,
+    "commitment1EstimatedRequests": 60004,
+    "commitment1LinearElapsedEstimateHours": 4.4,
+    "commitment2Blocks": 300001,
+    "commitment2EstimatedRequests": 1200004,
+    "commitment2LinearElapsedEstimateHours": 89,
+    "conclusion": "Technically supported at the sampled archive height, but exhaustive scans of the existing windows are operationally impractical under the current sequential bounded implementation. Estimates are inference, not measured full-window results."
+  }
+}

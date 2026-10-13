@@ -1,0 +1,48 @@
+{
+  "verified": true,
+  "verdict": "PASS",
+  "chainId": 99801,
+  "deploymentTransaction": "0x27de730fbc6301ff16b3ce7ce3ae9dde2a1064908f5e17e6470535ce63030d6a",
+  "deploymentBlock": "8160233",
+  "deployer": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+  "deploymentNonce": 9,
+  "contractAddress": "0x266bcaac497BaE5450B7aD3721376B3081DEc63c",
+  "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+  "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+  "returnAmount": "85000000000000000000000",
+  "sourceSha256": "c6b86382059949072b0e6c07d4cc855500d52392ab00ba1142609ed535ec423d",
+  "creationBytecodeSha256": "1460903f5b2e31057042cb3bbc1d877cc43dc0378d2aaf3699c5f8e560b15562",
+  "genericRuntimeTemplateSha256": "95ca1edfa1ee823b3668353e0818a31faf6934be729991c92ae5d1ffec0e60c8",
+  "constructorSpecializedRuntimeSha256": "c2723a034950101f61e4bae13e75c3008774b650c003a2d87ad042561de4c98c",
+  "runtimeVerification": {
+    "method": "patch only compiler-declared immutableReferences with verified constructor values, then require byte-for-byte equality with eth_getCode",
+    "runtimeLengthBytes": 920,
+    "differingByteCount": 117,
+    "differencesOutsideImmutableReferences": 0,
+    "reconstructedEqualsActual": true,
+    "immutableReferences": {
+      "token": [
+        { "identifier": "29", "offset": 231, "length": 32 },
+        { "identifier": "29", "offset": 395, "length": 32 },
+        { "identifier": "29", "offset": 667, "length": 32 }
+      ],
+      "subject": [
+        { "identifier": "31", "offset": 94, "length": 32 },
+        { "identifier": "31", "offset": 276, "length": 32 },
+        { "identifier": "31", "offset": 611, "length": 32 }
+      ]
+    }
+  },
+  "readback": {
+    "tokenMatches": true,
+    "subjectMatches": true,
+    "returnAmountMatches": true,
+    "restored": false,
+    "helperBalance": "0",
+    "subjectBalance": "100000000000000000000000"
+  },
+  "behavioralTests": {
+    "pass": 8,
+    "fail": 0
+  }
+}

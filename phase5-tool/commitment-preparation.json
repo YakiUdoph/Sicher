@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-10-12T22:48:43.392Z",
+  "sample": {
+    "firstBlock": "8118406",
+    "lastBlock": "8118526",
+    "intervalCount": 120,
+    "firstTimestamp": "1791845293",
+    "lastTimestamp": "1791845311"
+  },
+  "cadence": {
+    "medianSecondsPerBlock": 0,
+    "averageSecondsPerBlock": 0.15,
+    "minimumSecondsPerBlock": 0,
+    "maximumSecondsPerBlock": 1,
+    "designSecondsPerBlock": 0.15
+  },
+  "policy": {
+    "targetStartDelaySeconds": 600,
+    "targetProofWindowSeconds": 1800,
+    "safetyMarginPercent": 25,
+    "startDelayBlocks": "5000",
+    "proofWindowBlocks": "15000",
+    "minimumRemainingDelayBlocks": "4000"
+  }
+}

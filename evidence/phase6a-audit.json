@@ -1,0 +1,184 @@
+{
+  "schema": "sicher.phase6a.audit/1.0",
+  "timestamp": "2026-10-13T11:50:47.018Z",
+  "status": "COMPLETE_WITH_FINDINGS",
+  "chainId": 99801,
+  "network": "Elysium testnet",
+  "frozenFingerprints": {
+    "historicalVerifier": {
+      "path": "scripts/historical-min-balance-verifier.ts",
+      "expectedSha256": "d3d82e32f3b9fe56fa7627b597e4efb48ec31a7f5b22bc61964e0227f13737ba",
+      "actualSha256": "d3d82e32f3b9fe56fa7627b597e4efb48ec31a7f5b22bc61964e0227f13737ba",
+      "match": true
+    },
+    "finalizer": {
+      "path": "scripts/finalize-commitment2.ts",
+      "expectedSha256": "b6ec36bc2df543271263f51aa974900648d4c23ef4f6da8330567fdd0e647764",
+      "actualSha256": "b6ec36bc2df543271263f51aa974900648d4c23ef4f6da8330567fdd0e647764",
+      "match": true
+    },
+    "reconstructionCore": {
+      "path": "scripts/min-balance-core.ts",
+      "expectedSha256": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a",
+      "actualSha256": "22a4e7725a93cc75beac24373eaa81584f19ddeedc96a23b91a4867d8068f32a",
+      "match": true
+    },
+    "verification": "PASS"
+  },
+  "sourceOfTruthAudit": {
+    "onChainImmutableData": [
+      "commitment id",
+      "creator",
+      "subject",
+      "token",
+      "minimum balance",
+      "start block",
+      "end block"
+    ],
+    "configurationThenChainValidated": [
+      "chain ID",
+      "registry address"
+    ],
+    "chainHistory": [
+      "balanceOf(subject) at startBlock - 1",
+      "ERC20 Transfer logs",
+      "transaction hashes",
+      "block numbers",
+      "transactionIndex",
+      "logIndex",
+      "reconstructed balances",
+      "minimum observed"
+    ],
+    "localSoftware": [
+      "verifier version and fingerprints",
+      "reconstruction algorithm",
+      "RPC configuration",
+      "ABI artifacts",
+      "receipt formatting",
+      "frozen Commitment #2 expected terms and evidence"
+    ],
+    "localFilesUsedByFrozenFinalizer": [
+      "scripts/finalize-commitment2.ts",
+      "scripts/min-balance-core.ts",
+      "scripts/historical-min-balance-verifier.ts (fingerprinted, not executed by finalizer)",
+      "artifacts/SicherCommitmentProof.json",
+      "artifacts/SicherTestToken.json",
+      "evidence/phase5-commitment2-finalization-candidate.json"
+    ],
+    "nonAuthoritativeWorkflowState": [
+      "phase5-tool/*.json",
+      "evidence/phase5-min-balance.manifest.json"
+    ],
+    "editableVerdictCacheControlsFinalVerdict": false,
+    "finding": "The frozen finalizer re-reads chain evidence and does not consume workflow verdict caches. Its fingerprint manifest and ABI artifacts remain editable local inputs and are not externally anchored."
+  },
+  "cleanStateReproduction": {
+    "cachePolicy": "No previously generated verdict/cache JSON was read or trusted; terms were re-read from registry storage and histories were freshly queried from archive RPC.",
+    "commitment1": {
+      "storageRead": "PASS",
+      "window": { "startBlock": "8126584", "endBlock": "8141584", "status": "COMPLETE" },
+      "startingBalance": "100000000000000000000000",
+      "orderedTransferCount": 1,
+      "path": ["100000000000000000000000", "92000000000000000000000"],
+      "minimumRequired": "80000000000000000000000",
+      "minimumObserved": "92000000000000000000000",
+      "finalReconstructedBalance": "92000000000000000000000",
+      "result": "PASS"
+    },
+    "commitment2": {
+      "storageRead": "PASS",
+      "snapshotBlock": "8449964",
+      "window": { "startBlock": "8220689", "endBlock": "8520689", "status": "ACTIVE" },
+      "startingBalance": "100000000000000000000000",
+      "orderedTransferCount": 3,
+      "path": [
+        "100000000000000000000000",
+        "92000000000000000000000",
+        "15000000000000000000000",
+        "100000000000000000000000"
+      ],
+      "minimumRequired": "80000000000000000000000",
+      "minimumObserved": "15000000000000000000000",
+      "breachEstablished": true,
+      "historicalVerifierResult": "FAIL",
+      "finalReceiptGenerated": false
+    },
+    "finalizationGateDemonstration": {
+      "snapshotBlock": "8450344",
+      "blocksRemaining": "70345",
+      "windowStatus": "ACTIVE",
+      "finalizationReady": false,
+      "finalReceiptGenerated": false
+    }
+  },
+  "evidenceCompletenessFindings": [
+    { "case": "RPC timeout", "genericVerifier": "INDETERMINATE", "finalizer": "throws/stops", "safe": true },
+    { "case": "HTTP failure", "genericVerifier": "INDETERMINATE after retry classification", "finalizer": "throws/stops", "safe": true },
+    { "case": "rate limiting", "genericVerifier": "INDETERMINATE after retries", "finalizer": "throws/stops after transport retries", "safe": true },
+    { "case": "successful but truncated log response", "genericVerifier": "may treat as complete", "finalizer": "may treat as complete if omissions still satisfy its checks; otherwise stops", "safe": false },
+    { "case": "explicit missing chunk", "genericVerifier": "INDETERMINATE", "finalizer": "not chunked; request failure throws/stops", "safe": true },
+    { "case": "duplicated chunk/log", "genericVerifier": "deduplicates exact duplicates; conflicting duplicate becomes INDETERMINATE", "finalizer": "core deduplicates exact duplicates; conflicting duplicate stops", "safe": true },
+    { "case": "overlapping chunks", "genericVerifier": "not produced by inclusiveChunks; duplicate logs deduplicate", "finalizer": "not chunked", "safe": true },
+    { "case": "provider disagreement", "genericVerifier": "not detected", "finalizer": "not detected", "safe": false },
+    { "case": "historical balance unavailable", "genericVerifier": "INDETERMINATE", "finalizer": "throws/stops", "safe": true },
+    { "case": "malformed relevant Transfer log", "genericVerifier": "INDETERMINATE", "finalizer": "throws/stops", "safe": true },
+    { "case": "wrong chain ID", "genericVerifier": "FAIL or INDETERMINATE", "finalizer": "throws/stops", "safe": true },
+    { "case": "wrong token", "genericVerifier": "not registry-bound and can evaluate supplied token", "finalizer": "registry field and frozen token must match", "safe": false },
+    { "case": "wrong registry", "genericVerifier": "does not read registry", "finalizer": "uses frozen registry and verifies storage", "safe": false },
+    { "case": "unexpected relevant transfer", "genericVerifier": "accounts for it", "finalizer": "throws/stops unless exact expected set", "safe": true },
+    { "case": "partial window", "genericVerifier": "ACTIVE unless a monotonic FAIL is already established", "finalizer": "no receipt", "safe": true },
+    { "case": "current block below completion block", "genericVerifier": "never terminal PASS", "finalizer": "ACTIVE / no receipt", "safe": true }
+  ],
+  "orderingFindings": {
+    "order": ["blockNumber", "transactionIndex", "logIndex"],
+    "multipleTransfersSameBlock": "ordered by transactionIndex then logIndex",
+    "multipleTransfersSameTransaction": "ordered by logIndex",
+    "incoming": "adds value",
+    "outgoing": "subtracts value",
+    "selfTransfer": "subtracts then adds the same value; net zero",
+    "irrelevantLogs": "generic verifier filters at RPC by subject topics; finalizer filters decoded logs to subject/helper",
+    "duplicates": "exact transactionHash/logIndex duplicates are deduplicated; conflicts are rejected",
+    "result": "PASS"
+  },
+  "arithmeticFindings": {
+    "representation": "BigInt base units",
+    "floatingPointAffectsVerdict": false,
+    "decimalsUse": "presentation only via formatUnits",
+    "thresholdBaseUnits": "80000000000000000000000",
+    "historicalMinimumBaseUnits": "15000000000000000000000",
+    "successComparison": "minimum < required is FAIL; equality is not a breach",
+    "boundaryTests": { "exactThreshold": "PASS", "oneBaseUnitBelow": "FAIL" },
+    "result": "PASS"
+  },
+  "temporalSemanticsFindings": {
+    "inclusiveWindow": "startBlock <= observedBlock <= endBlock",
+    "evidenceEnd": "min(currentBlock, endBlock)",
+    "finalizationEligibility": "currentBlock >= endBlock",
+    "internalConsistency": "Consistent for an available canonical end block because scanning includes endBlock.",
+    "risk": "At currentBlock == endBlock there is no confirmation-depth or reorganization margin, and RPC calls are not bound to a common block hash snapshot.",
+    "result": "PASS_WITH_MEDIUM_RISK"
+  },
+  "tests": {
+    "command": "npm.cmd run test:min-balance",
+    "passed": 22,
+    "failed": 0
+  },
+  "claimsBoundaryDocument": "docs/PHASE6_CLAIMS_BOUNDARY.md",
+  "reproducibilityDocument": "docs/REPRODUCIBILITY.md",
+  "discoveredRisks": [
+    { "severity": "CRITICAL", "id": "RPC-SILENT-OMISSION", "description": "A successful but truncated or silently incomplete log response is accepted as complete; missing evidence can therefore become PASS for a compliant-looking history." },
+    { "severity": "HIGH", "id": "SINGLE-PROVIDER", "description": "No provider quorum, disagreement detection, block-receipt reconciliation, or cryptographic completeness proof exists." },
+    { "severity": "HIGH", "id": "GENERIC-NOT-REGISTRY-BOUND", "description": "The generic verifier accepts token, subject, window, and minimum from environment variables and does not compare them to registry storage." },
+    { "severity": "HIGH", "id": "LOCAL-TRUST-ANCHOR", "description": "The fingerprint manifest and ABI artifacts are editable local files; the candidate manifest is not externally signed or anchored." },
+    { "severity": "MEDIUM", "id": "END-BLOCK-FINALITY", "description": "Finalization is eligible at currentBlock == endBlock without confirmation depth or reorg protection." },
+    { "severity": "MEDIUM", "id": "TOKEN-MODEL", "description": "Transfer-event reconstruction is not valid for every rebasing, fee-on-transfer, or otherwise non-conventional token." },
+    { "severity": "MEDIUM", "id": "ACTIVE-FAIL-SEMANTICS", "description": "The generic verifier returns FAIL as soon as a monotonic breach is observed even while the window is active; consumers must not confuse this with a finalized receipt." },
+    { "severity": "LOW", "id": "LOCAL-RECEIPTS", "description": "Generated receipts are editable local JSON/text files and must not be called immutable." }
+  ],
+  "blockers": [
+    "Competition-grade/fail-closed completeness is blocked by undetectable successful RPC log omission or truncation.",
+    "Commitment #2 final receipt remains blocked until the inclusive window completion gate is met."
+  ],
+  "transactionsSent": 0,
+  "frozenPhase5FilesModified": false
+}

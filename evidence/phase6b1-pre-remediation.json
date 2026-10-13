@@ -1,0 +1,13 @@
+{
+  "recordedBeforePhase6B1Edits": true,
+  "recordedAt": "2026-10-13",
+  "phase6SourceFingerprintsSha256": {
+    "scripts/phase6-evidence-core.ts": "f23f02e24f211906cd4b72b93722cb5ea8840f35a8b4fb2e68e022f558f342e3",
+    "scripts/phase6-registry-verifier.ts": "540b144ea1dc78021be5c088b1954488ab5a3f1ccf8f0b6d2a05db4513e0174f"
+  },
+  "tests": {
+    "baseline": { "passed": 27, "failed": 23, "total": 50 },
+    "previousRedTeam": { "passed": 19, "failed": 16, "total": 35 }
+  },
+  "note": "The working tree already contained partial remediation when this record was made. Failures were preserved before further Phase 6 candidate changes. No Phase 5 file was changed to create this record."
+}

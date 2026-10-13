@@ -1,0 +1,128 @@
+{
+  "evidenceManifest": {
+    "schema": "sicher.phase6.evidence-manifest/1.0",
+    "chainId": "99801",
+    "registry": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+    "commitmentId": "1",
+    "evaluatedInterval": {
+      "fromBlock": "8126584",
+      "toBlock": "8141584"
+    },
+    "providers": [
+      {
+        "id": "hypedexer",
+        "endpoint": "https://elysium-testnet-rpc.hypedexer.com"
+      },
+      {
+        "id": "kinetiq",
+        "endpoint": "https://testnet-rpc.elysium.kinetiq.xyz"
+      }
+    ],
+    "providerIndependenceVerified": false,
+    "ranges": [
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8126584",
+        "toBlock": "8131583",
+        "status": "SUCCESS",
+        "logCount": 1,
+        "digest": "f80287764a4aad39cfc2f155858cdc6649afffa9c03113b1a9a45245b6701925"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8131584",
+        "toBlock": "8136583",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8136584",
+        "toBlock": "8141583",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8141584",
+        "toBlock": "8141584",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8126584",
+        "toBlock": "8131583",
+        "status": "SUCCESS",
+        "logCount": 1,
+        "digest": "f80287764a4aad39cfc2f155858cdc6649afffa9c03113b1a9a45245b6701925"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8131584",
+        "toBlock": "8136583",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8136584",
+        "toBlock": "8141583",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "kinetiq",
+        "fromBlock": "8141584",
+        "toBlock": "8141584",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    ],
+    "coverageComplete": true,
+    "consensus": true
+  },
+  "verificationRecord": {
+    "schema": "sicher.phase6.verification-record/1.0",
+    "canonicalSerialization": "RFC8785-inspired lexicographic JSON keys; BigInt encoded as base-10 strings; UTF-8; receiptDigest omitted while hashing",
+    "verifierFingerprint": "4942a3bb463733ce581d9c2c7013e5c2dcee9d129456a2c681e7446255cedb97",
+    "evidenceManifestDigest": "08ca8fe291f445b2af7692870fd6403ac7100667a746b5bcd001443793188b85",
+    "payload": {
+      "verifierVersion": "sicher-phase6-registry-verifier/1.0.0",
+      "chainId": "99801",
+      "registry": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+      "commitmentId": "1",
+      "creator": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+      "minimumBalance": "80000000000000000000000",
+      "startBlock": "8126584",
+      "endBlock": "8141584",
+      "currentBlock": "8456866",
+      "registryBound": true,
+      "evidenceRedundancy": "MULTI_PROVIDER",
+      "evidenceConsensus": true,
+      "providerIndependenceVerified": false,
+      "finalityPolicyVerified": false,
+      "confirmationDepth": "0",
+      "tokenModelStatus": "CONVENTIONAL_ERC20_TRANSFER_V1",
+      "windowStatus": "COMPLETE",
+      "breachStatus": "NOT_OBSERVED",
+      "finalVerdict": "INDETERMINATE",
+      "path": [
+        "100000000000000000000000",
+        "92000000000000000000000"
+      ],
+      "minimumObserved": "92000000000000000000000",
+      "finalBalance": "92000000000000000000000",
+      "reason": "Window has ended but the configured finality policy is unverified or unsatisfied."
+    },
+    "receiptDigest": "1d2b95704d3f0a93e9dcbe38f51cf72fd8c6155e1704eb602e0f9cd3edf8e0dd"
+  }
+}

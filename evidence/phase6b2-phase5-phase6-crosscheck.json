@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "sicher.phase5-phase6-crosscheck/1.0",
+  "phase5Path": "evidence/phase5-commitment2-final-receipt.json",
+  "phase6Path": "evidence/phase6b2-commitment2-receipt-v3.json",
+  "agreement": true,
+  "mismatches": [],
+  "phase5": {
+    "commitmentId": "2",
+    "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+    "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+    "minimumRequiredBaseUnits": "80000000000000000000000",
+    "startBlock": "8220689",
+    "endBlock": "8520689",
+    "startingBalanceBaseUnits": "100000000000000000000000",
+    "pathBaseUnits": [
+      "100000000000000000000000",
+      "92000000000000000000000",
+      "15000000000000000000000",
+      "100000000000000000000000"
+    ],
+    "minimumObservedBaseUnits": "15000000000000000000000",
+    "minimumCausingBlock": "8425736",
+    "minimumCausingTransactionHash": "0x2ad4aa32c27551c0dbe1795e94dd1b49bb1caf01b9e67e978a8c16912a2ef148",
+    "finalBalanceBaseUnits": "100000000000000000000000",
+    "proofResult": "NOT_PROVEN"
+  },
+  "phase6": {
+    "commitmentId": "2",
+    "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+    "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+    "minimumRequiredBaseUnits": "80000000000000000000000",
+    "startBlock": "8220689",
+    "endBlock": "8520689",
+    "startingBalanceBaseUnits": "100000000000000000000000",
+    "pathBaseUnits": [
+      "100000000000000000000000",
+      "92000000000000000000000",
+      "15000000000000000000000",
+      "100000000000000000000000"
+    ],
+    "minimumObservedBaseUnits": "15000000000000000000000",
+    "minimumCausingBlock": "8425736",
+    "minimumCausingTransactionHash": "0x2ad4aa32c27551c0dbe1795e94dd1b49bb1caf01b9e67e978a8c16912a2ef148",
+    "finalBalanceBaseUnits": "100000000000000000000000",
+    "proofResult": "NOT_PROVEN"
+  }
+}
