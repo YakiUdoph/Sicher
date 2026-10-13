@@ -1,0 +1,183 @@
+export const projects = [
+  {
+    id: 'northline',
+    name: 'Northline Commons',
+    initials: 'NC',
+    description: 'A fictional commons for slow, useful work.',
+    location: 'Demo project · fictional',
+    activeProofs: ['demo-running'],
+    proofHistory: ['demo-running']
+  },
+  {
+    id: 'fieldnote',
+    name: 'Fieldnote',
+    initials: 'FN',
+    description: 'A fictional notebook for neighbourhood observations.',
+    location: 'Demo project · fictional',
+    activeProofs: [],
+    proofHistory: ['demo-proven']
+  },
+  {
+    id: 'morrow',
+    name: 'Morrow Studio',
+    initials: 'MS',
+    description: 'A fictional studio for making long-term work visible.',
+    location: 'Demo project · fictional',
+    activeProofs: [],
+    proofHistory: ['demo-breach']
+  },
+  {
+    id: 'juniper',
+    name: 'Juniper Room',
+    initials: 'JR',
+    description: 'A fictional room for small, careful gatherings.',
+    location: 'Demo project · fictional',
+    activeProofs: ['demo-running-juniper'],
+    proofHistory: ['demo-running-juniper']
+  },
+  {
+    id: 'quiet-signal',
+    name: 'Quiet Signal',
+    initials: 'QS',
+    description: 'A fictional studio for patient public notes.',
+    location: 'Demo project · fictional',
+    activeProofs: [],
+    proofHistory: ['demo-proven-quiet']
+  },
+  {
+    id: 'paper-house',
+    name: 'Paper House',
+    initials: 'PH',
+    description: 'A fictional workshop for things worth keeping.',
+    location: 'Demo project · fictional',
+    activeProofs: [],
+    proofHistory: ['demo-breach-paper']
+  }
+];
+
+export const proofs = [
+  {
+    id: 'demo-running',
+    projectId: 'northline',
+    label: 'Demo proof',
+    status: 'running',
+    statusLabel: 'Proof running',
+    commitment: 'Keep at least 80,000 here for 7 days.',
+    shortCommitment: 'Keep at least 80,000 here',
+    duration: '7 days',
+    startValue: '100,000',
+    threshold: '80,000',
+    currentValue: '92,000',
+    remaining: '4 days left',
+    started: '14 Sep 2026',
+    ends: '21 Sep 2026',
+    startedBy: 'northline-demo',
+    sequence: ['100,000', '97,000', '92,000'],
+    accent: 'blue'
+  },
+  {
+    id: 'demo-proven',
+    projectId: 'fieldnote',
+    label: 'Demo proof',
+    status: 'proven',
+    statusLabel: 'Proven',
+    commitment: 'Keep at least 50,000 here for 5 days.',
+    shortCommitment: 'Keep at least 50,000 here',
+    duration: '5 days',
+    startValue: '75,000',
+    threshold: '50,000',
+    currentValue: '75,000',
+    remaining: 'Complete',
+    started: '02 Sep 2026',
+    ends: '07 Sep 2026',
+    startedBy: 'fieldnote-demo',
+    sequence: ['75,000', '63,000', '75,000'],
+    accent: 'green'
+  },
+  {
+    id: 'demo-breach',
+    projectId: 'morrow',
+    label: 'Demo proof',
+    status: 'not-proven',
+    statusLabel: 'Not proven',
+    commitment: 'Keep at least 80,000 here for 7 days.',
+    shortCommitment: 'Keep at least 80,000 here',
+    duration: '7 days',
+    startValue: '100,000',
+    threshold: '80,000',
+    currentValue: '100,000',
+    remaining: 'Complete',
+    started: '04 Aug 2026',
+    ends: '11 Aug 2026',
+    startedBy: 'morrow-demo',
+    sequence: ['100,000', '92,000', '15,000', '100,000'],
+    breachValue: '15,000',
+    breachDay: 'Day 3',
+    breachCopy: 'The funds came back, but the commitment had already been broken.',
+    accent: 'coral'
+  },
+  {
+    id: 'demo-running-juniper',
+    projectId: 'juniper',
+    label: 'Demo proof',
+    status: 'running',
+    statusLabel: 'Proof running',
+    commitment: 'Keep at least 35,000 here for 10 days.',
+    shortCommitment: 'Keep at least 35,000 here',
+    duration: '10 days',
+    startValue: '60,000',
+    threshold: '35,000',
+    currentValue: '41,000',
+    remaining: '6 days left',
+    started: '18 Sep 2026',
+    ends: '28 Sep 2026',
+    startedBy: 'juniper-demo',
+    sequence: ['60,000', '48,000', '41,000'],
+    accent: 'blue'
+  },
+  {
+    id: 'demo-proven-quiet',
+    projectId: 'quiet-signal',
+    label: 'Demo proof',
+    status: 'proven',
+    statusLabel: 'Proven',
+    commitment: 'Keep at least 25,000 here for 3 days.',
+    shortCommitment: 'Keep at least 25,000 here',
+    duration: '3 days',
+    startValue: '32,000',
+    threshold: '25,000',
+    currentValue: '32,000',
+    remaining: 'Complete',
+    started: '09 Sep 2026',
+    ends: '12 Sep 2026',
+    startedBy: 'quiet-signal-demo',
+    sequence: ['32,000', '26,000', '32,000'],
+    accent: 'green'
+  },
+  {
+    id: 'demo-breach-paper',
+    projectId: 'paper-house',
+    label: 'Demo proof',
+    status: 'not-proven',
+    statusLabel: 'Not proven',
+    commitment: 'Keep at least 60,000 here for 5 days.',
+    shortCommitment: 'Keep at least 60,000 here',
+    duration: '5 days',
+    startValue: '80,000',
+    threshold: '60,000',
+    currentValue: '80,000',
+    remaining: 'Complete',
+    started: '26 Aug 2026',
+    ends: '31 Aug 2026',
+    startedBy: 'paper-house-demo',
+    sequence: ['80,000', '61,000', '12,000', '80,000'],
+    breachValue: '12,000',
+    breachDay: 'Day 2',
+    breachCopy: 'The amount returned, but the commitment had already been broken.',
+    accent: 'coral'
+  }
+];
+
+export const getProject = (id) => projects.find((project) => project.id === id) || projects[0];
+export const getProof = (id) => proofs.find((proof) => proof.id === id) || proofs[0];
+export const getProofsForProject = (projectId) => proofs.filter((proof) => proof.projectId === projectId);

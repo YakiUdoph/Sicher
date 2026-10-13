@@ -1,0 +1,11 @@
+{
+  "routes": [
+    { "path": "/", "title": "Sicher — Proof, not promises." },
+    { "path": "/explore", "title": "Explore proofs — Sicher" },
+    { "path": "/project/:id", "title": "Project profile — Sicher" },
+    { "path": "/start", "title": "Start a proof — Sicher" },
+    { "path": "/proof/:id", "title": "Proof detail — Sicher" },
+    { "path": "/proof/:id/receipt", "title": "Proof receipt — Sicher" },
+    { "path": "/about", "title": "How Sicher works — Sicher" }
+  ]
+}
