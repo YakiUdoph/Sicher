@@ -296,7 +296,12 @@ a:hover .arrow, button:hover .arrow { transform: translate(4px, -2px); }
 .technical-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-top: 25px; }
 .technical-grid span, .technical-grid b { display: block; font-size: 11px; }
 .technical-grid span { color: var(--text-secondary); margin-bottom: 6px; }
-.technical-grid b { font-weight: 500; }
+.technical-grid b { font-weight: 500; overflow-wrap: anywhere; word-break: break-word; }
+
+.public-record-notice { margin: 24px 0; padding: 18px 20px; border: 1px solid var(--line); background: rgba(255,255,255,.45); }
+.public-record-notice strong { display: block; margin-bottom: 6px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.public-record-notice p { margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 1.55; }
+.transaction-pending .inline-action { display: block; margin-top: 14px; }
 
 /* about */
 .about-hero { padding: 78px 0 82px; }

@@ -73,7 +73,7 @@ test("9 official historical values, verdicts, and assurance are unchanged", () =
 test("10 frozen product logic remains byte-identical", () => {
   const expected = new Map([
     ["frontend/src/chainConfig.js", "a88163e0ca04a1b1a748cc52dd51aeeffe028e59660753a3b5470bcee2a7e1a8"],
-    ["frontend/src/commitmentTransaction.js", "c422d530572b13fc33739a20aaf6182612f02f41280285666a0b73efafeea9d7"],
+    ["frontend/src/commitmentTransaction.js", "6d8044587bf3ac2a8d92e810a2870a02ff9f77b94114cdd5aa0cff20ba40f1c1"],
     ["frontend/src/wallet.js", "c6a32ec6fae41c2e6c5ef6ca2f00d4a88ffffedf3fefb7589b422d0b539c5a86"],
     ["frontend/src/walletContext.jsx", "aa8e1b0e2c7e045cd328de11bbad7554f536c35f5bc25e692ba4cdc71c5a82d4"],
     ["frontend/src/verifiedCommitments.ts", "02a6c0f7e3a1de12f6c4002773b1f569016df30c78ea44489ca87411bd4bc22f"],

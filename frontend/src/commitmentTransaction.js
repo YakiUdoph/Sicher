@@ -1,16 +1,25 @@
-import { decodeEventLog, decodeFunctionResult, encodeFunctionData, getAddress, parseUnits } from 'viem';
+import { decodeEventLog, decodeFunctionResult, encodeEventTopics, encodeFunctionData, getAddress, parseUnits } from 'viem';
 import { ELYSIUM_CHAIN_ID_HEX, ELYSIUM_RPC_URL, REGISTRY_ABI, REGISTRY_ADDRESS, STEST_ADDRESS, STEST_DECIMALS } from './chainConfig.js';
 
 export const TX_STATE = Object.freeze({
   IDLE: 'IDLE', PREPARING: 'PREPARING', AWAITING_WALLET: 'AWAITING_WALLET',
   SUBMITTED: 'SUBMITTED', CONFIRMING: 'CONFIRMING', CONFIRMED: 'CONFIRMED',
-  PRE_BROADCAST_FAILED: 'PRE_BROADCAST_FAILED', AMBIGUOUS: 'AMBIGUOUS', REVERTED: 'REVERTED',
+  PRE_BROADCAST_FAILED: 'PRE_BROADCAST_FAILED', UNKNOWN_SEND: 'UNKNOWN_SEND',
+  UNKNOWN_SEND_DUPLICATE: 'UNKNOWN_SEND_DUPLICATE', AMBIGUOUS: 'AMBIGUOUS', REVERTED: 'REVERTED',
   READY: 'IDLE', AWAITING_WALLET_APPROVAL: 'AWAITING_WALLET',
   REJECTED: 'PRE_BROADCAST_FAILED', FAILED: 'PRE_BROADCAST_FAILED',
 });
 export const PENDING_TX_STORAGE_KEY = 'sicher.pending-commitment.v1';
 export const PENDING_TX_SCHEMA = 'sicher.pending-commitment/1';
+export const UNKNOWN_SEND_STORAGE_KEY = 'sicher.unknown-send.v1';
+export const UNKNOWN_SEND_SCHEMA = 'sicher.unknown-send/1';
 export const AMBIGUOUS_TRANSACTION_MESSAGE = "Your transaction was submitted, but Sicher hasn't finished confirming it yet. Don't start another proof.";
+export const UNKNOWN_SEND_MESSAGE = "We couldn't confirm whether your wallet submitted this transaction. Don't start another proof yet. Retrying immediately could create a duplicate commitment.";
+export const UNKNOWN_SEND_NO_MATCH_MESSAGE = "No matching commitment was found in the bounded search yet. Submission is still unresolved; don't start another proof.";
+export const UNKNOWN_SEND_DUPLICATE_MESSAGE = 'Multiple matching commitments were found. Sicher will not guess which one came from this attempt.';
+export const ACCOUNT_CHANGED_MESSAGE = 'Your wallet account changed. Review the commitment again before submitting.';
+export const CHAIN_CHANGED_MESSAGE = 'Your wallet network changed. Switch back to Elysium Testnet and review the commitment again.';
+export const UNKNOWN_RECONCILE_MAX_BLOCKS = 5_000n;
 const addressPattern = /^0x[0-9a-fA-F]{40}$/;
 const integerPattern = /^(0|[1-9][0-9]*)$/;
 const zeroAddressPattern = /^0x0{40}$/i;
@@ -85,6 +94,49 @@ export function loadPendingTransaction(storage = browserStorage()) {
 
 export function clearPendingTransaction(storage = browserStorage()) {
   storage?.removeItem?.(PENDING_TX_STORAGE_KEY);
+}
+
+export function buildUnknownSendAttempt(input, account, attemptBlock, preSendNonce, attemptedAt = Date.now()) {
+  return {
+    schema: UNKNOWN_SEND_SCHEMA,
+    chainId: ELYSIUM_CHAIN_ID_HEX,
+    registry: getAddress(REGISTRY_ADDRESS),
+    sender: getAddress(account),
+    preSendAccount: getAddress(account),
+    subject: getAddress(input.subject),
+    token: getAddress(STEST_ADDRESS),
+    minimumBalance: parseMinimumBalance(input.minimum).toString(),
+    startBlock: BigInt(input.startBlock).toString(),
+    endBlock: BigInt(input.endBlock).toString(),
+    attemptBlock: BigInt(attemptBlock).toString(),
+    preSendNonce: preSendNonce === null ? null : BigInt(preSendNonce).toString(),
+    attemptedAt,
+  };
+}
+
+export function persistUnknownSendAttempt(attempt, storage = browserStorage()) {
+  if (!storage?.setItem) return false;
+  try { storage.setItem(UNKNOWN_SEND_STORAGE_KEY, JSON.stringify(attempt)); return true; }
+  catch { return false; }
+}
+
+export function loadUnknownSendAttempt(storage = browserStorage()) {
+  if (!storage?.getItem) return null;
+  try {
+    const value = JSON.parse(storage.getItem(UNKNOWN_SEND_STORAGE_KEY));
+    if (value?.schema !== UNKNOWN_SEND_SCHEMA || value.chainId?.toLowerCase() !== ELYSIUM_CHAIN_ID_HEX ||
+      !addressPattern.test(value.sender ?? '') || !addressPattern.test(value.preSendAccount ?? '') ||
+      value.sender.toLowerCase() !== value.preSendAccount.toLowerCase() || !addressPattern.test(value.subject ?? '') ||
+      !addressPattern.test(value.token ?? '') || !addressPattern.test(value.registry ?? '') ||
+      !integerPattern.test(value.minimumBalance ?? '') || !integerPattern.test(value.startBlock ?? '') ||
+      !integerPattern.test(value.endBlock ?? '') || !integerPattern.test(value.attemptBlock ?? '') ||
+      !(value.preSendNonce === null || integerPattern.test(value.preSendNonce ?? '')) || typeof value.attemptedAt !== 'number') return null;
+    return value;
+  } catch { return null; }
+}
+
+export function clearUnknownSendAttempt(storage = browserStorage()) {
+  storage?.removeItem?.(UNKNOWN_SEND_STORAGE_KEY);
 }
 
 export function pendingMatchesTerms(pending, input, account) {
@@ -299,6 +351,72 @@ export async function reconcilePendingTransaction(provider, pending, onState = (
   }
 }
 
+function pendingFromUnknownAttempt(attempt, txHash) {
+  return {
+    schema: PENDING_TX_SCHEMA, chainId: attempt.chainId, registry: attempt.registry, txHash,
+    sender: attempt.sender, subject: attempt.subject, token: attempt.token,
+    minimumBalance: attempt.minimumBalance, startBlock: attempt.startBlock, endBlock: attempt.endBlock,
+    createdAt: attempt.attemptedAt,
+  };
+}
+
+function eventMatchesUnknownAttempt(event, attempt) {
+  return event.creator?.toLowerCase() === attempt.sender.toLowerCase() &&
+    event.subject?.toLowerCase() === attempt.subject.toLowerCase() && event.token?.toLowerCase() === attempt.token.toLowerCase() &&
+    event.minimumBalance?.toString() === attempt.minimumBalance && event.startBlock?.toString() === attempt.startBlock &&
+    event.endBlock?.toString() === attempt.endBlock;
+}
+
+export async function reconcileUnknownSendAttempt(provider, attempt, onState = () => {}, options = {}) {
+  const storage = options.storage ?? browserStorage();
+  const unresolved = (message = UNKNOWN_SEND_MESSAGE, error = null) => {
+    onState(TX_STATE.UNKNOWN_SEND, { hash: null, unknownAttempt: attempt, error: message });
+    return { state: TX_STATE.UNKNOWN_SEND, unknownAttempt: attempt, error };
+  };
+  try {
+    const latestBlock = rpcQuantity(await provider.request({ method: 'eth_blockNumber' }));
+    const fromBlock = BigInt(attempt.attemptBlock);
+    if (latestBlock < fromBlock) return unresolved(UNKNOWN_SEND_NO_MATCH_MESSAGE);
+    const toBlock = latestBlock < fromBlock + UNKNOWN_RECONCILE_MAX_BLOCKS - 1n
+      ? latestBlock : fromBlock + UNKNOWN_RECONCILE_MAX_BLOCKS - 1n;
+    const topics = encodeEventTopics({
+      abi: REGISTRY_ABI, eventName: 'CommitmentCreated',
+      args: { creator: getAddress(attempt.sender), subject: getAddress(attempt.subject) },
+    });
+    const logs = await provider.request({
+      method: 'eth_getLogs',
+      params: [{ address: getAddress(attempt.registry), fromBlock: toRpcQuantity(fromBlock), toBlock: toRpcQuantity(toBlock), topics }],
+    });
+    const matches = [];
+    for (const log of logs ?? []) {
+      if (!/^0x[0-9a-f]{64}$/i.test(log.transactionHash ?? '')) continue;
+      let event;
+      try { event = decodeEventLog({ abi: REGISTRY_ABI, eventName: 'CommitmentCreated', data: log.data, topics: log.topics }).args; }
+      catch { continue; }
+      if (!eventMatchesUnknownAttempt(event, attempt)) continue;
+      if (attempt.preSendNonce !== null) {
+        const transaction = await provider.request({ method: 'eth_getTransactionByHash', params: [log.transactionHash] });
+        if (transaction?.from && transaction.from.toLowerCase() !== attempt.sender.toLowerCase()) continue;
+        if (transaction?.nonce !== undefined && rpcQuantity(transaction.nonce).toString() !== attempt.preSendNonce) continue;
+      }
+      if (!matches.some((item) => item.transactionHash.toLowerCase() === log.transactionHash.toLowerCase())) matches.push(log);
+    }
+    if (matches.length === 0) return unresolved(UNKNOWN_SEND_NO_MATCH_MESSAGE);
+    if (matches.length > 1) {
+      onState(TX_STATE.UNKNOWN_SEND_DUPLICATE, { hash: null, unknownAttempt: attempt, error: UNKNOWN_SEND_DUPLICATE_MESSAGE });
+      return { state: TX_STATE.UNKNOWN_SEND_DUPLICATE, unknownAttempt: attempt, matches: matches.length, error: UNKNOWN_SEND_DUPLICATE_MESSAGE };
+    }
+    const pending = pendingFromUnknownAttempt(attempt, matches[0].transactionHash);
+    if (storage?.setItem && !persistPendingTransaction(pending, storage)) {
+      return unresolved("A matching transaction was found, but Sicher couldn't preserve its hash. Submission remains unresolved.");
+    }
+    clearUnknownSendAttempt(storage);
+    return reconcilePendingTransaction(provider, pending, onState, { storage });
+  } catch (error) {
+    return unresolved(UNKNOWN_SEND_MESSAGE, error);
+  }
+}
+
 export async function prepareCommitmentForWallet(provider, input, account, { readHead = readCurrentElysiumBlock, readFees = readFreshEip1559Fees, onHead = () => {} } = {}) {
   const chainId = await provider.request({ method: 'eth_chainId' });
   if (chainId.toLowerCase() !== ELYSIUM_CHAIN_ID_HEX) throw new Error('Switch to Elysium Testnet before submitting.');
@@ -315,23 +433,55 @@ export async function prepareCommitmentForWallet(provider, input, account, { rea
 }
 
 export async function submitCommitment(provider, input, account, onState = () => {}, options = {}) {
+  const storage = options.storage ?? browserStorage();
+  const unresolvedAttempt = loadUnknownSendAttempt(storage);
+  if (unresolvedAttempt) {
+    onState(TX_STATE.UNKNOWN_SEND, { hash: null, unknownAttempt: unresolvedAttempt, error: UNKNOWN_SEND_MESSAGE });
+    return { state: TX_STATE.UNKNOWN_SEND, unknownAttempt: unresolvedAttempt, error: UNKNOWN_SEND_MESSAGE };
+  }
   onState(TX_STATE.PREPARING);
-  const { transaction } = await prepareCommitmentForWallet(provider, input, account, options);
+  const { transaction, currentHead } = await prepareCommitmentForWallet(provider, input, account, options);
+  const accounts = await provider.request({ method: 'eth_accounts' });
+  if (!Array.isArray(accounts) || !accounts[0] || accounts[0].toLowerCase() !== account.toLowerCase()) {
+    throw Object.assign(new Error(ACCOUNT_CHANGED_MESSAGE), { code: 'ACCOUNT_CHANGED' });
+  }
+  const chainId = await provider.request({ method: 'eth_chainId' });
+  if (typeof chainId !== 'string' || chainId.toLowerCase() !== ELYSIUM_CHAIN_ID_HEX) {
+    throw Object.assign(new Error(CHAIN_CHANGED_MESSAGE), { code: 'CHAIN_CHANGED' });
+  }
+  let preSendNonce = null;
+  try { preSendNonce = rpcQuantity(await provider.request({ method: 'eth_getTransactionCount', params: [account, 'pending'] })); }
+  catch { /* Nonce is advisory; event terms and sender remain the recovery boundary. */ }
+  const unknownAttempt = buildUnknownSendAttempt(input, account, currentHead, preSendNonce, options.now?.() ?? Date.now());
+  if (typeof globalThis.window !== 'undefined' && !storage?.setItem) {
+    throw new Error("Sicher couldn't access local recovery storage, so the wallet request was not opened.");
+  }
+  if (storage?.setItem && !persistUnknownSendAttempt(unknownAttempt, storage)) {
+    throw new Error("Sicher couldn't preserve the recovery record, so the wallet request was not opened.");
+  }
   onState(TX_STATE.AWAITING_WALLET);
   let hash;
   try { hash = await provider.request({ method: 'eth_sendTransaction', params: [transaction] }); }
   catch (error) {
     if (error?.code === 4001) {
+      clearUnknownSendAttempt(storage);
       const message = 'Transaction cancelled. Nothing was submitted.';
       onState(TX_STATE.PRE_BROADCAST_FAILED, { error: message });
       return { state: TX_STATE.PRE_BROADCAST_FAILED, error: message };
     }
-    if (/max fee|base fee|fee per gas|underpriced/i.test(error?.message ?? '')) throw new Error(FEE_PREPARATION_MESSAGE, { cause: error });
-    throw error;
+    onState(TX_STATE.UNKNOWN_SEND, { hash: null, unknownAttempt, error: UNKNOWN_SEND_MESSAGE });
+    return { state: TX_STATE.UNKNOWN_SEND, unknownAttempt, error: UNKNOWN_SEND_MESSAGE };
   }
-  const storage = options.storage ?? browserStorage();
+  if (!/^0x[0-9a-f]{64}$/i.test(hash ?? '')) {
+    onState(TX_STATE.UNKNOWN_SEND, { hash: null, unknownAttempt, error: UNKNOWN_SEND_MESSAGE });
+    return { state: TX_STATE.UNKNOWN_SEND, unknownAttempt, error: UNKNOWN_SEND_MESSAGE };
+  }
   const pending = buildPendingTransaction(input, account, hash, options.now?.() ?? Date.now());
-  persistPendingTransaction(pending, storage);
+  if (storage?.setItem && !persistPendingTransaction(pending, storage)) {
+    onState(TX_STATE.UNKNOWN_SEND, { hash: null, unknownAttempt, error: UNKNOWN_SEND_MESSAGE });
+    return { state: TX_STATE.UNKNOWN_SEND, unknownAttempt, error: UNKNOWN_SEND_MESSAGE };
+  }
+  clearUnknownSendAttempt(storage);
   onState(TX_STATE.SUBMITTED, { hash, pending });
   onState(TX_STATE.CONFIRMING, { hash, pending });
   try {

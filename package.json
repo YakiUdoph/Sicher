@@ -61,6 +61,7 @@
     "phase7d2:test-fees": "node --test test/Phase7D2FeePreparation.test.ts",
     "phase7d2b:test-live-fees": "node --test test/Phase7D2BLiveFeeFailure.test.ts",
     "phase7d4:test-transaction-safety": "node --test test/Phase7D4TransactionSafety.test.ts",
+    "phase8c:test-release-boundary": "node --test test/Phase8CReleaseBoundary.test.ts",
     "phase7d4:reconcile-7-readonly": "node scripts/phase7d4-readonly-reconcile.ts",
     "typecheck": "tsc --noEmit"
   },

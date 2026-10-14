@@ -40,6 +40,8 @@ function baseProvider(overrides: Record<string, (args: any) => any> = {}) {
   return { request: async (args: any) => {
     if (overrides[args.method]) return overrides[args.method](args);
     if (args.method === 'eth_chainId') return ELYSIUM_CHAIN_ID_HEX;
+    if (args.method === 'eth_accounts') return [ACCOUNT];
+    if (args.method === 'eth_getTransactionCount') return '0x11';
     if (args.method === 'eth_estimateGas') return '0x5208';
     if (args.method === 'eth_getBalance') return '0x1';
     if (args.method === 'eth_sendTransaction') return HASH;
