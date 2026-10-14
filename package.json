@@ -50,6 +50,18 @@
     "phase6:crosscheck-phase5": "node scripts/phase6-crosscheck-phase5.ts",
     "phase6:benchmark-receipts": "node scripts/phase6-receipt-capability-benchmark.ts",
     "phase6:verify-registry": "node scripts/phase6-registry-verifier.ts",
+    "phase7:prepare-frontend-data": "node scripts/phase7-prepare-frontend-data.ts",
+    "phase7:test-frontend-data": "node --test test/Phase7FrontendData.test.ts",
+    "phase7:test": "node --test test/Phase7FrontendData.test.ts test/Phase7B2FrontendBinding.test.ts test/Phase7CFunctionalFrontend.test.ts",
+    "phase7c1:test-brand": "node --test test/Phase7C1Brand.test.ts",
+    "phase7c3:test-content": "node --test test/Phase7C3ContentDensity.test.ts",
+    "phase7c4:test-hero": "node --test test/Phase7C4HeroAsset.test.ts",
+    "phase7c5:test-newcomer": "node --test test/Phase7C5NewcomerClarity.test.ts",
+    "phase7d1:test-validation": "node --test test/Phase7D1BlockValidation.test.ts",
+    "phase7d2:test-fees": "node --test test/Phase7D2FeePreparation.test.ts",
+    "phase7d2b:test-live-fees": "node --test test/Phase7D2BLiveFeeFailure.test.ts",
+    "phase7d4:test-transaction-safety": "node --test test/Phase7D4TransactionSafety.test.ts",
+    "phase7d4:reconcile-7-readonly": "node scripts/phase7d4-readonly-reconcile.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

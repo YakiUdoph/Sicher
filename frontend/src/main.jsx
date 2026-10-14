@@ -1,187 +1,116 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { getProject, getProof, getProofsForProject, projects, proofs } from './data';
-import { resolveRoute, formatCommitment } from './logic';
-import { Arrow, DetailGrid, Eyebrow, Footer, Logo, PageIntro, ProofCard, ProofStrip, RecordCard, StatusPill, Timeline, TopNav, TrustNote } from './components';
+import { resolveRoute } from './logic';
+import { Arrow, AssuranceNote, DataNotice, Eyebrow, Footer, PageIntro, ProofStrip, StatusPill, TopNav, TrustNote, VerifiedProofCard, VerifiedRecordCard } from './components';
+import { loadExploreState, loadProjectState } from './commitmentPresentation';
+import { ELYSIUM_NETWORK_NAME, REGISTRY_ADDRESS, STEST_ADDRESS } from './chainConfig.js';
+import { createSubmissionGuard, loadPendingTransaction, pendingMatchesTerms, pendingMatchesWallet, proofWindowEnd, readCurrentElysiumBlock, reconcilePendingTransaction, safeStartBlock, submitCommitment, TX_STATE, validateCommitmentInput } from './commitmentTransaction.js';
+import { useWallet, WalletProvider } from './walletContext.jsx';
+import { shortenAddress } from './wallet.js';
 import './styles.css';
 
-const HERO_IMAGE = '/manus-storage/async-images/kQEQBNjABLygDaIQotLlsk/image-1.webp';
-
-function usePageTitle(title) {
-  useEffect(() => { document.title = title ? `${title} — Sicher` : 'Sicher — Proof, not promises.'; }, [title]);
-}
-
-function Shell({ current, children }) {
-  return <><TopNav current={current} />{children}<Footer /></>;
-}
+function usePageTitle(title) { useEffect(() => { document.title = title ? `${title} — Sicher` : 'Sicher — Proof, not promises.'; }, [title]); }
+function Shell({ current, children }) { return <><TopNav current={current} />{children}<Footer /></>; }
+function useExploreCommitments() { const [state, setState] = useState({ kind: 'loading' }); useEffect(() => { let active = true; loadExploreState().then((next) => { if (active) setState(next); }); return () => { active = false; }; }, []); return state; }
+function useProjectCommitment(id) { const [state, setState] = useState({ kind: 'loading' }); useEffect(() => { let active = true; setState({ kind: 'loading' }); loadProjectState(id).then((next) => { if (active) setState(next); }); return () => { active = false; }; }, [id]); return state; }
+function stripProof(commitment) { return { status: commitment.status, sequence: commitment.path.map((value) => value.replace(` ${commitment.tokenSymbol}`, '')) }; }
+function CopyButton({ value, label = 'Copy' }) { const [copied, setCopied] = useState(false); return <button type="button" className="copy-value" onClick={async () => { await navigator.clipboard?.writeText(value); setCopied(true); }}>{copied ? 'Copied' : label}</button>; }
 
 function Home() {
   usePageTitle('Proof, not promises.');
-  const breach = getProof('demo-breach');
-  const running = getProof('demo-running');
-  const [activeIndex, setActiveIndex] = useState(2);
-  const momentCopy = [
-    ['The promise', 'A project says what it will keep visible.'],
-    ['Still proving', 'The record keeps checking, even when everything looks fine.'],
-    ['The breach', '15,000 is below the 80,000 threshold. The commitment breaks.'],
-    ['After', 'The funds come back. The broken moment does not disappear.']
-  ];
-  return <Shell current="home">
-    <main>
-      <section className="hero">
-        <div className="hero-image-wrap"><img src={HERO_IMAGE} alt="Sunlight refracting through layered architectural glass" /><div className="hero-image-wash" /></div>
-        <div className="hero-grid-line hero-grid-line-one" /><div className="hero-grid-line hero-grid-line-two" />
-        <div className="hero-copy">
-          <Eyebrow>Public proof for measurable commitments</Eyebrow>
-          <h1>Proof,<br /><em>not promises.</em></h1>
-          <p className="hero-lede">Projects say what they’ll do.<br />Sicher shows whether they did it.</p>
-          <div className="hero-actions"><a href="/explore" className="button button-primary">Explore proofs <Arrow /></a><a href="/start" className="button button-ghost">Start a proof <Arrow /></a></div>
-        </div>
-        <div className="hero-note">01 <span>What was hidden<br />becomes visible.</span></div>
-        <ProofCard proof={running} featured />
-        <div className="hero-caption"><span>Fig. 01</span><span>Light, time, evidence.</span></div>
-      </section>
-
-      <section className="statement-section container">
-        <div className="statement-rule" />
-        <div className="statement-grid"><Eyebrow>Why Sicher</Eyebrow><h2>Anyone can make a promise.<br /><em>The interesting part is what happens next.</em></h2></div>
-        <p className="statement-aside">A commitment is only meaningful when the whole period is visible. Sicher keeps the beginning, the middle, and the end in the same record.</p>
-      </section>
-
-      <section className="sequence-section container">
-        <div className="section-heading"><div><Eyebrow>One proof, in full</Eyebrow><h2>Before → during → after</h2></div><p>Returning to the starting point does not erase the moment the condition was broken.</p></div>
-        <div className="sequence-stage">
-          <div className="sequence-side"><span>Threshold</span><strong>80,000</strong><small>must stay above</small></div>
-          <div className="sequence-visual"><ProofStrip proof={breach} interactive activeIndex={activeIndex} onSelect={setActiveIndex} /><div className="sequence-detail"><div><Eyebrow>{momentCopy[activeIndex][0]}</Eyebrow><p>{momentCopy[activeIndex][1]}</p></div><span className="sequence-counter">0{activeIndex + 1} / 04</span></div></div>
-          <div className="sequence-result"><StatusPill status="not-proven" label="Not proven" /><h3>{activeIndex === 2 ? 'The record remembers.' : 'A clean ending is not the whole story.'}</h3><p>{activeIndex === 2 ? breach.breachCopy : 'Sicher checks the entire promised period, not only the last visible number.'}</p><a href="/proof/demo-breach" className="text-link">See what happened <Arrow small /></a></div>
-        </div>
-      </section>
-
-      <section className="home-records container">
-        <div className="section-heading"><div><Eyebrow>Public record</Eyebrow><h2>Proofs worth looking at.</h2></div><a href="/explore" className="text-link">Explore all proofs <Arrow small /></a></div>
-        <div className="record-preview-grid">{proofs.map((proof) => <ProofCard key={proof.id} proof={proof} />)}</div>
-      </section>
-
-      <section className="closing-callout"><div className="container closing-inner"><Eyebrow>Make the promise visible</Eyebrow><h2>Say exactly what you’ll do.<br /><em>Let time answer the rest.</em></h2><a href="/start" className="button button-light">Start a proof <Arrow /></a></div></section>
-    </main>
-  </Shell>;
+  const data = useExploreCommitments();
+  const breach = data.kind === 'success' ? data.commitments.find((item) => item.id === '2') : null;
+  return <Shell current="home"><main><section className="hero"><div className="hero-image-wrap" aria-hidden="true"><img src="/sicher-hero-web.jpg" alt="" /><div className="hero-image-wash" /></div><div className="hero-grid-line hero-grid-line-one" /><div className="hero-grid-line hero-grid-line-two" /><div className="hero-copy"><h1>Proof,<br /><em>not promises.</em></h1><p className="hero-lede">Make a measurable commitment.<br />Sicher keeps the record.</p><div className="hero-actions"><a href="/start" className="button button-primary">Start a proof <Arrow /></a><a href="/explore" className="button button-ghost">Explore proofs <Arrow /></a></div></div>{breach ? <VerifiedProofCard commitment={breach} featured /> : <div className="proof-card proof-card-featured"><Eyebrow>Validated record</Eyebrow><p className="proof-card-title">{data.kind === 'loading' ? 'Loading…' : 'Unavailable.'}</p></div>}</section>
+    <section className="sequence-section container"><div className="section-heading"><div><Eyebrow>Real testnet record · Commitment #2</Eyebrow><h2>A real proof on Elysium Testnet</h2></div><p>STEST is the test token used for this Elysium proof.</p></div>{breach ? <><p className="sequence-promise">This wallet promised to keep at least <strong>{breach.minimumRequired}</strong> throughout the commitment.</p><div className="sequence-stage"><div className="sequence-side"><span>Promised minimum</span><strong>{breach.minimumRequired.replace(' STEST', '')}</strong><small>STEST</small><p>The balance had to stay at or above this amount for the whole commitment.</p></div><div className="sequence-visual"><Eyebrow>Wallet balance during the commitment</Eyebrow><ProofStrip proof={stripProof(breach)} /><p>It dropped to {breach.minimumObserved} before recovering.</p></div><div className="sequence-result"><StatusPill status={breach.status} label={breach.statusLabel} /><small>The commitment was broken during the period.</small><h3>The balance recovered.</h3><p>The breach didn’t disappear.</p><a href="/proof/2" className="text-link">Inspect the proof <Arrow small /></a></div></div></> : <DataNotice title="Validated record unavailable." body="Missing evidence never implies success." />}</section>
+    <section className="home-records container"><div className="section-heading"><div><Eyebrow>Public record</Eyebrow><h2>Proofs worth looking at.</h2></div><a href="/explore" className="text-link">Explore all proofs <Arrow small /></a></div>{data.kind === 'success' ? <div className="record-preview-grid">{data.commitments.map((item) => <VerifiedProofCard key={item.id} commitment={item} />)}</div> : <DataNotice title="Validated records unavailable." body="No stale result is displayed." />}</section>
+    <section className="closing-callout"><div className="container closing-inner"><Eyebrow>Make it measurable</Eyebrow><h2>Commit first.<br /><em>Then show the record.</em></h2><a href="/start" className="button button-light">Start a proof <Arrow /></a></div></section></main></Shell>;
 }
 
 function Explore() {
-  usePageTitle('Explore proofs');
-  const [filter, setFilter] = useState('all');
-  const [query, setQuery] = useState('');
-  const filtered = useMemo(() => proofs.filter((proof) => {
-    const project = getProject(proof.projectId);
-    const matchesFilter = filter === 'all' || proof.status === filter;
-    const haystack = `${project.name} ${proof.commitment} ${proof.statusLabel}`.toLowerCase();
-    return matchesFilter && haystack.includes(query.toLowerCase());
-  }), [filter, query]);
-  return <Shell current="explore"><main className="container explore-page">
-    <PageIntro eyebrow="A curated public record" title={<>Explore<br /><em>proofs.</em></>} body="Every record answers the same simple questions: who promised what, for how long, and what happened next."><TrustNote /></PageIntro>
-    <div className="explore-controls"><label className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find a project or proof" aria-label="Find a project or proof" /></label><div className="filter-row" aria-label="Filter proofs">{[['all', 'All'], ['running', 'Running'], ['proven', 'Proven'], ['not-proven', 'Not proven']].map(([value, label]) => <button type="button" className={filter === value ? 'filter active' : 'filter'} key={value} onClick={() => setFilter(value)}>{label}</button>)}</div></div>
-    <div className="explore-list"><div className="list-heading"><Eyebrow>{filtered.length} demo records</Eyebrow><span>Newest first</span></div>{filtered.map((proof) => <RecordCard key={proof.id} proof={proof} project={getProject(proof.projectId)} />)}{filtered.length === 0 && <div className="empty-state"><h3>No matching proof yet.</h3><p>Try another project name or choose All.</p></div>}</div>
-  </main></Shell>;
+  usePageTitle('Explore proofs'); const data = useExploreCommitments(); const [filter, setFilter] = useState('all'); const [query, setQuery] = useState('');
+  const filtered = useMemo(() => (data.kind === 'success' ? data.commitments : []).filter((item) => (filter === 'all' || item.status === filter) && `${item.id} ${item.title} ${item.tokenSymbol} ${item.statusLabel}`.toLowerCase().includes(query.toLowerCase())), [data, filter, query]);
+  return <Shell current="explore"><main className="container explore-page"><PageIntro eyebrow="Public record" title={<>Explore<br /><em>proofs.</em></>} body="Real historical commitments recorded on Elysium Testnet."><p className="intro-note">STEST is the Sicher Test Token used for these proofs.</p><TrustNote /></PageIntro><div className="explore-controls"><label className="search-field"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find an ID, token, or status" aria-label="Find an ID, token, or status" /></label><div className="filter-row" aria-label="Filter proofs">{[['all', 'All'], ['proven', 'Proven'], ['not-proven', 'Not proven']].map(([value, label]) => <button type="button" className={filter === value ? 'filter active' : 'filter'} key={value} onClick={() => setFilter(value)}>{label}</button>)}</div></div><div className="explore-list">{data.kind === 'loading' && <DataNotice title="Loading commitments…" body="Validating receipt data." />}{data.kind === 'error' && <DataNotice title="Records unavailable." body="Missing evidence never implies success." />}{data.kind === 'success' && <><div className="list-heading"><Eyebrow>{filtered.length} validated {filtered.length === 1 ? 'record' : 'records'}</Eyebrow><span>Commitment ID</span></div>{filtered.map((item) => <VerifiedRecordCard key={item.id} commitment={item} />)}{filtered.length === 0 && <DataNotice title="No matching commitment." body="Try an ID, STEST, or status." />}</>}</div></main></Shell>;
 }
 
-function ProjectPage({ id }) {
-  const project = getProject(id);
-  const projectProofs = getProofsForProject(project.id);
-  usePageTitle(project.name);
-  return <Shell><main className="container project-page">
-    <div className="project-hero"><a href="/explore" className="back-link">← Explore proofs</a><div className="project-identity"><div className="large-initials">{project.initials}</div><div><Eyebrow>{project.location}</Eyebrow><h1>{project.name}</h1><p>{project.description}</p></div></div><div className="project-caption">A project profile is a living record.<br />Failed commitments stay visible.</div></div>
-    <section className="project-section"><div className="section-heading"><div><Eyebrow>Active commitments</Eyebrow><h2>What is being proved now.</h2></div><span className="section-number">01</span></div>{projectProofs.filter((proof) => proof.status === 'running').map((proof) => <ProofCard key={proof.id} proof={proof} featured />)}{!projectProofs.some((proof) => proof.status === 'running') && <div className="quiet-empty">No active commitments in this demo record.</div>}</section>
-    <section className="project-section"><div className="section-heading"><div><Eyebrow>Complete proof history</Eyebrow><h2>What happened before.</h2></div><span className="section-number">02</span></div><div className="history-list">{projectProofs.map((proof) => <RecordCard key={proof.id} proof={proof} project={project} />)}</div></section>
-  </main></Shell>;
+function CommitmentLoading({ state, id, children }) {
+  if (state.kind === 'loading') return <Shell><main className="container not-found"><DataNotice title="Loading validated commitment…" body="Receipt data is being checked." /></main></Shell>;
+  if (state.kind !== 'success') return <Shell><main className="container not-found"><DataNotice title="Commitment not found." body={`No validated commitment or receipt exists for ID ${id}.`} /><a href="/explore" className="button button-primary">Explore proofs <Arrow /></a></main></Shell>;
+  return children(state.commitment);
 }
+
+function ProjectPage({ id }) { const state = useProjectCommitment(id); usePageTitle(state.kind === 'success' ? state.commitment.title : 'Commitment record'); return <CommitmentLoading state={state} id={id}>{(c) => <Shell><main className="container project-page"><div className="project-hero"><a href="/explore" className="back-link">← Explore proofs</a><div className="project-identity"><div className="large-initials">{c.initials}</div><div><Eyebrow>Real Elysium testnet record · {c.tokenSymbol}</Eyebrow><h1>{c.title}</h1><p className="record-context">STEST is the test token used for this Elysium proof.</p></div></div></div><ProjectSummary commitment={c} /><div className="project-proof-link"><a href={`/proof/${c.id}`} className="button button-primary">Open proof <Arrow /></a></div></main></Shell>}</CommitmentLoading>; }
+
+function ProjectSummary({ commitment: c }) { const kept = c.status === 'proven'; return <><section className="project-overview"><div className="project-question-grid"><div><Eyebrow>The promise</Eyebrow><strong>This wallet committed to keep at least {c.minimumRequired}.</strong></div><div><Eyebrow>What happened</Eyebrow><strong>{kept ? `Its lowest observed balance was ${c.minimumObserved}.` : `It fell to ${c.minimumObserved} before returning to ${c.finalBalance}.`}</strong></div><div><Eyebrow>The result</Eyebrow><StatusPill status={c.status} label={c.statusLabel} /><p className="verdict-meaning">{kept ? 'Proven — the balance stayed at or above the promised minimum for the full period.' : 'Not proven — the commitment was broken during the period.'}</p></div></div><div className="project-path"><Eyebrow>Wallet balance during the commitment</Eyebrow><ProofStrip proof={stripProof(c)} /></div>{kept ? <p className="project-conclusion">The promise was kept for the full recorded period.</p> : <p className="project-conclusion">The balance recovered. The breach didn’t disappear.</p>}<AssuranceNote commitment={c} /></section><details className="project-details"><summary>Commitment and chain details <span>+</span></summary><div className="technical-grid"><Technical label="Network" value={ELYSIUM_NETWORK_NAME} /><Technical label="Block range" value={`${c.startBlock}–${c.endBlock}`} /><Technical label="Starting balance" value={c.startingBalance} /><Technical label="Final balance" value={c.finalBalance} /><Technical label="Token" value={c.token} /><Technical label="Subject" value={c.subject} /><Technical label="Receipt digest" value={c.receiptDigest} /><Technical label="Verifier fingerprint" value={c.provenance.verifierFingerprint} /></div></details></>; }
 
 function StartProof() {
-  usePageTitle('Start a proof');
-  const steps = ['What will you prove?', 'Where?', 'Set the limit', 'How long?', 'Review your exact words', 'Start'];
-  const [step, setStep] = useState(1);
-  const [amount, setAmount] = useState('80,000');
-  const [template, setTemplate] = useState('minimum');
-  const [duration, setDuration] = useState('7 days');
-  const [started, setStarted] = useState(false);
-  const templateDetails = template === 'minimum'
-    ? { name: 'Keep at least this amount here', description: 'The clearest place to begin.', fieldLabel: 'Must stay above' }
-    : { name: 'Limit how much can leave', description: 'Set a clear ceiling for the period.', fieldLabel: 'Maximum allowed to leave' };
-  const commitment = template === 'minimum' ? `Keep at least ${amount} here for ${duration}.` : `Limit how much can leave to ${amount} over ${duration}.`;
-  const canAdvance = step < 6;
-  return <Shell><main className="container start-page">
-    <div className="start-layout"><aside className="start-rail"><a href="/" className="back-link">← Home</a><Eyebrow>Start a proof</Eyebrow><div className="step-list">{steps.map((label, index) => <button type="button" key={label} className={`${step === index + 1 ? 'active' : ''} ${step > index + 1 ? 'done' : ''}`} onClick={() => index + 1 <= step && setStep(index + 1)}><span>0{index + 1}</span>{label}</button>)}</div><p className="rail-note">A proof is specific by design. Once it starts, the exact condition cannot quietly change.</p></aside>
-      <section className="start-content"><div className="start-kicker"><span>Step 0{step}</span><span>Demo flow · no live action</span></div>{started ? <div className="started-state"><span className="success-seal">✓</span><Eyebrow>Demo proof prepared</Eyebrow><h1>Your words are now<br /><em>ready to be witnessed.</em></h1><p>This is a design preview. No live proof has been started. When connected, this exact condition will become the public record.</p><a href="/explore" className="button button-primary">Explore proofs <Arrow /></a></div> : <>
-        {step === 1 && <Step title="What will you prove?"><h1>Make the condition<br /><em>plain enough to repeat.</em></h1><p className="step-copy">Choose one of two demo templates. The exact words will stay visible through the whole record.</p><div className="choice-stack"><button type="button" className={template === 'minimum' ? 'choice selected' : 'choice'} onClick={() => setTemplate('minimum')}><span>01</span><b>Keep at least this amount here</b><small>The clearest place to begin.</small></button><button type="button" className={template === 'limit' ? 'choice selected' : 'choice'} onClick={() => setTemplate('limit')}><span>02</span><b>Limit how much can leave</b><small>Set a clear ceiling for the period.</small></button></div></Step>}
-        {step === 2 && <Step title="Where?"><h1>Name the place<br /><em>the promise lives.</em></h1><p className="step-copy">This fictional demo location is the public place people will use to check the condition.</p><label className="large-field"><span>Place</span><input defaultValue="Northline Commons" /></label><p className="field-hint">Demo location · fictional record</p></Step>}
-        {step === 3 && <Step title="Set the limit"><h1>What is the<br /><em>line to protect?</em></h1><p className="step-copy">Set the number the proof will be measured against for the whole period.</p><label className="large-field"><span>{templateDetails.fieldLabel}</span><input value={amount} onChange={(event) => setAmount(event.target.value)} inputMode="numeric" /></label></Step>}
-        {step === 4 && <Step title="How long?"><h1>Give the promise<br /><em>enough time.</em></h1><p className="step-copy">Choose a period that makes the commitment meaningful.</p><div className="duration-options">{['24 hours', '7 days', '30 days'].map((value) => <button type="button" className={duration === value ? 'duration selected' : 'duration'} key={value} onClick={() => setDuration(value)}>{value}<span>{value === '7 days' ? 'A clear first window' : 'Available in the live flow'}</span></button>)}</div></Step>}
-        {step === 5 && <Step title="Review your exact words"><div className="review-card"><Eyebrow>{templateDetails.name}</Eyebrow><h1>“{commitment}”</h1><div className="review-rule" /><p>Once started, this condition cannot quietly change.</p><span className="review-demo"><i />Demo flow · no live action</span></div></Step>}
-        {step === 6 && <Step title="Start"><div className="review-card review-card-final"><Eyebrow>Ready when you are</Eyebrow><h1>Make the commitment<br /><em>visible.</em></h1><p>Your proof will be created exactly as written above. In this preview, the next step is intentionally paused before any live action.</p><button type="button" className="button button-primary" onClick={() => setStarted(true)}>Start this proof <Arrow /></button></div></Step>}
-        <div className="step-actions">{step > 1 && <button type="button" className="button button-ghost" onClick={() => setStep(step - 1)}>Back</button>}{canAdvance && <button type="button" className="button button-primary" onClick={() => setStep(step + 1)}>{step === 5 ? 'Review start' : 'Continue'} <Arrow /></button>}</div>
-      </>}</section>
-    </div>
-  </main></Shell>;
+  usePageTitle('Start a proof'); const wallet = useWallet();
+  const initialPending = useMemo(() => loadPendingTransaction(), []);
+  const submitGuard = useRef(createSubmissionGuard());
+  const reconcileGuard = useRef(createSubmissionGuard());
+  const autoCheckedHash = useRef(null);
+  const [input, setInput] = useState({ subject: wallet.account ?? '', minimum: '', startBlock: '', endBlock: '' });
+  const [tx, setTx] = useState(() => initialPending
+    ? { state: TX_STATE.AMBIGUOUS, hash: initialPending.txHash, pending: initialPending, commitment: null, error: "Sicher found a submitted transaction that still needs confirmation. Don't start another proof." }
+    : { state: TX_STATE.IDLE, hash: null, pending: null, commitment: null, error: null });
+  const [head, setHead] = useState({ status: 'loading', value: null, error: null });
+  useEffect(() => { if (wallet.account && !input.subject) setInput((old) => ({ ...old, subject: wallet.account })); }, [wallet.account, input.subject]);
+  const refreshHead = useCallback(async ({ showLoading = false } = {}) => { if (showLoading) setHead((old) => ({ ...old, status: 'loading', error: null })); try { const value = await readCurrentElysiumBlock(); setHead({ status: 'success', value, error: null }); return value; } catch (error) { setHead({ status: 'error', value: null, error: error.message }); throw error; } }, []);
+  useEffect(() => { refreshHead({ showLoading: true }).catch(() => {}); const timer = window.setInterval(() => refreshHead().catch(() => {}), 15_000); return () => window.clearInterval(timer); }, [refreshHead]);
+  const updateTx = useCallback((state, extra = {}) => setTx((old) => ({ ...old, state, ...extra })), []);
+  const checkPending = useCallback(() => {
+    const pending = loadPendingTransaction() ?? tx.pending;
+    if (!pending || !wallet.provider || !pendingMatchesWallet(pending, wallet.account, wallet.chainId)) return Promise.resolve(null);
+    return reconcileGuard.current.run(() => reconcilePendingTransaction(wallet.provider, pending, updateTx));
+  }, [tx.pending, updateTx, wallet.account, wallet.chainId, wallet.provider]);
+  useEffect(() => {
+    const pending = loadPendingTransaction();
+    if (!pendingMatchesWallet(pending, wallet.account, wallet.chainId) || autoCheckedHash.current === pending.txHash) return;
+    autoCheckedHash.current = pending.txHash;
+    checkPending().catch(() => {});
+  }, [checkPending, wallet.account, wallet.chainId]);
+  const checked = useMemo(() => validateCommitmentInput(input, head.status === 'success' ? head.value : null), [input, head]);
+  const busy = [TX_STATE.PREPARING, TX_STATE.AWAITING_WALLET, TX_STATE.SUBMITTED, TX_STATE.CONFIRMING].includes(tx.state);
+  const update = (field) => (event) => setInput((old) => ({ ...old, [field]: event.target.value }));
+  const chooseSafeStart = async () => { try { const current = await refreshHead({ showLoading: true }); const start = safeStartBlock(current); setInput((old) => ({ ...old, startBlock: start.toString(), endBlock: proofWindowEnd(start).toString() })); } catch { /* The live-head panel explains why this is unavailable. */ } };
+  const chooseProofWindow = () => { if (!/^\d+$/.test(input.startBlock) || BigInt(input.startBlock) <= 0n) return; setInput((old) => ({ ...old, endBlock: proofWindowEnd(BigInt(old.startBlock)).toString() })); };
+  const submit = () => submitGuard.current.run(async () => {
+    const pending = loadPendingTransaction();
+    if (pending && pendingMatchesTerms(pending, input, wallet.account)) {
+      setTx({ state: TX_STATE.AMBIGUOUS, hash: pending.txHash, pending, commitment: null, error: "These exact terms already have a submitted transaction. Check it instead of starting another proof." });
+      return { state: TX_STATE.AMBIGUOUS, hash: pending.txHash };
+    }
+    if (pending) {
+      setTx({ state: TX_STATE.AMBIGUOUS, hash: pending.txHash, pending, commitment: null, error: "A submitted transaction still needs confirmation. Check it before starting another proof." });
+      return { state: TX_STATE.AMBIGUOUS, hash: pending.txHash };
+    }
+    setTx({ state: TX_STATE.PREPARING, hash: null, pending: null, commitment: null, error: null });
+    try {
+      return await submitCommitment(wallet.provider, input, wallet.account, updateTx, { readHead: readCurrentElysiumBlock, onHead: (value) => setHead({ status: 'success', value, error: null }) });
+    } catch (error) {
+      if (error?.code === 'AMBIGUOUS_TRANSACTION') {
+        setTx({ state: TX_STATE.AMBIGUOUS, hash: error.hash, pending: error.pending, commitment: null, error: "Your transaction was submitted, but Sicher hasn't finished confirming it yet. Don't start another proof." });
+        return { state: TX_STATE.AMBIGUOUS, hash: error.hash };
+      }
+      setTx({ state: TX_STATE.PRE_BROADCAST_FAILED, hash: null, pending: null, commitment: null, error: error?.message || 'Nothing was submitted. Check the details and try again.' });
+      return { state: TX_STATE.PRE_BROADCAST_FAILED, error };
+    }
+  });
+  const retryable = [TX_STATE.IDLE, TX_STATE.PRE_BROADCAST_FAILED, TX_STATE.REVERTED].includes(tx.state);
+  const canSubmit = Boolean(wallet.account && wallet.correctChain && head.status === 'success' && checked.valid && retryable && !busy);
+  const ctaLabel = tx.state === TX_STATE.PREPARING ? 'Preparing…' : tx.state === TX_STATE.AWAITING_WALLET ? 'Check your wallet…' : [TX_STATE.SUBMITTED, TX_STATE.CONFIRMING].includes(tx.state) ? 'Confirming on Elysium…' : 'Review in wallet and start';
+  return <Shell><main className="container start-page"><PageIntro eyebrow="Start a proof" title={<>Record the<br /><em>commitment.</em></>} body="Set a measurable promise before the period begins." /><div className="start-layout"><aside className="start-rail"><a href="/" className="back-link">← Home</a><Eyebrow>Transaction context</Eyebrow><p className="rail-note">{ELYSIUM_NETWORK_NAME}<br />Registry: {shortenAddress(REGISTRY_ADDRESS)}<br />Authorized by your wallet.</p></aside><section className="start-content"><div className="start-kicker"><span>MIN_BALANCE</span><span>{ELYSIUM_NETWORK_NAME}</span></div>
+    {tx.state === TX_STATE.CONFIRMED ? <div className="started-state"><span className="success-seal">✓</span><Eyebrow>Registry readback confirmed</Eyebrow><h1>Proof started.</h1><p>Commitment ID: <strong>#{tx.commitment.id.toString()}</strong>. The commitment is active; final evaluation is not yet available. It is not Proven, and no terminal receipt exists.</p><p>Transaction: <code>{tx.hash}</code></p></div> : <div className="step-view"><Eyebrow>Supported proof type · MIN_BALANCE</Eyebrow><h1>Keep at least a<br /><em>minimum balance.</em></h1><p className="step-copy">Choose the wallet, token, minimum balance, and block range. Sicher records the terms before the outcome is known.</p><div className={`chain-head chain-head-${head.status}`} role="status"><div><span>Current Elysium block</span><strong>{head.status === 'success' ? head.value.toString() : head.status === 'loading' ? 'Checking…' : 'Unavailable'}</strong></div><button type="button" className="inline-action" onClick={() => refreshHead({ showLoading: true }).catch(() => {})}>Refresh</button></div>{head.error && <p className="field-error">{head.error}</p>}<label className="large-field"><span>Token</span><input value="Sicher Test Token (STEST)" readOnly /></label><p className="field-hint">STEST is the test token used for Elysium proofs. <code>{STEST_ADDRESS}</code></p><label className="large-field"><span>Subject address</span><input value={input.subject} onChange={update('subject')} placeholder="0x…" /></label>{checked.errors.subject && <p className="field-error">{checked.errors.subject}</p>}<label className="large-field"><span>Minimum balance (STEST)</span><input value={input.minimum} onChange={update('minimum')} inputMode="decimal" placeholder="e.g. 80000" /></label><p className="field-hint">The amount that must be maintained.</p>{checked.errors.minimum && <p className="field-error">{checked.errors.minimum}</p>}<div className="duration-options"><div><label className="large-field"><span>Start block</span><input value={input.startBlock} onChange={update('startBlock')} inputMode="numeric" placeholder="Exact block" /></label><div className="field-helper"><span>Must be later than the current block.</span><button type="button" className="inline-action" onClick={chooseSafeStart}>Use safe start (+2,000)</button></div></div><div><label className="large-field"><span>End block</span><input value={input.endBlock} onChange={update('endBlock')} inputMode="numeric" placeholder="Exact block" /></label><div className="field-helper"><span>Must come after the start.</span><button type="button" className="inline-action" onClick={chooseProofWindow}>Use 3,000-block window</button></div></div></div>{(checked.errors.startBlock || checked.errors.endBlock) && <p className="field-error">{checked.errors.startBlock || checked.errors.endBlock}</p>}
+    <div className="review-card"><Eyebrow>Exact transaction terms</Eyebrow><h2>Keep at least {input.minimum || '—'} STEST</h2><div className="technical-grid"><div><span>Network</span><b>{ELYSIUM_NETWORK_NAME}</b></div><div><span>Proof</span><b>Keep at least a minimum balance</b></div><div><span>Subject</span><b>{input.subject || '—'}</b></div><div><span>Token</span><b>Sicher Test Token (STEST)</b></div><div><span>Minimum</span><b>{input.minimum ? `${input.minimum} STEST` : '—'}</b></div><div><span>Starts</span><b>{input.startBlock || '—'}</b></div><div><span>Ends</span><b>{input.endBlock || '—'}</b></div><div><span>Current block</span><b>{head.status === 'success' ? head.value.toString() : 'Unavailable'}</b></div><div><span>Status</span><b className={checked.valid ? 'review-valid' : 'review-invalid'}>{checked.valid ? 'Starts in the future' : 'Not ready'}</b></div></div></div>
+    {!wallet.account ? <button type="button" className="button button-primary" onClick={wallet.connect}>Connect wallet</button> : !wallet.correctChain ? <button type="button" className="button button-primary" onClick={wallet.switchNetwork}>Switch to Elysium Testnet</button> : tx.state === TX_STATE.AMBIGUOUS ? <div className="transaction-pending" aria-live="polite"><Eyebrow>Confirmation unresolved</Eyebrow><p>Your transaction may already be on Elysium. Don’t start another proof.</p><code>{tx.hash}</code><button type="button" className="button button-primary" onClick={checkPending}>Check transaction <Arrow /></button></div> : <button type="button" className="button button-primary" disabled={!canSubmit} aria-disabled={!canSubmit} onClick={submit}>{ctaLabel} <Arrow /></button>}{tx.hash && [TX_STATE.SUBMITTED, TX_STATE.CONFIRMING].includes(tx.state) && <p role="status" aria-live="polite">Transaction submitted: {shortenAddress(tx.hash)} · waiting for a successful receipt and registry readback. Don’t start another proof.</p>}{tx.error && tx.state !== TX_STATE.AMBIGUOUS && <p className="field-error" role="alert">{tx.error}</p>}</div>}</section></div></main></Shell>;
 }
 
-function Step({ title, children }) { return <div className="step-view"><Eyebrow>{title}</Eyebrow>{children}</div>; }
+function ProofPage({ id }) { const state = useProjectCommitment(id); usePageTitle(`Commitment #${id} proof`); return <CommitmentLoading state={state} id={id}>{(c) => { const kept = c.status === 'proven'; return <Shell><main className={`proof-detail proof-detail-${c.status}`}><div className="container"><a href="/explore" className="back-link">← All proofs</a><div className="proof-detail-top"><div><Eyebrow>Real Elysium testnet record · Commitment #{c.id}</Eyebrow><h1>{c.statusLabel}.</h1><p className="verdict-meaning">{kept ? 'The balance stayed at or above the promised minimum for the full period.' : 'The commitment was broken during the period.'}</p></div><div className="assurance-summary"><span className="assurance-label">{c.assuranceLabel}</span><small>Checked across multiple sources</small></div></div><section className="proof-human"><div className="proof-facts"><div><Eyebrow>Promised minimum</Eyebrow><strong>{c.minimumRequired}</strong><p>The balance had to stay at or above this amount for the whole commitment.</p></div><div><Eyebrow>Lowest observed</Eyebrow><strong>{c.minimumObserved}</strong>{!kept && <p>Breach — below the promised minimum.</p>}</div></div><div className="proof-path"><Eyebrow>Wallet balance during the commitment</Eyebrow><ProofStrip proof={stripProof(c)} /></div>{kept ? <p className="proof-conclusion">The promise was kept for the full recorded period.</p> : <p className="proof-conclusion">The balance recovered. The breach didn’t disappear.</p>}</section><AssuranceNote commitment={c} /><div className="proof-bottom-actions"><a className="button button-primary" href={`/proof/${c.id}/receipt`}>Open receipt <Arrow /></a><span>{c.assuranceLabel} · Elysium Testnet</span></div></div></main></Shell>; }}</CommitmentLoading>; }
 
-function ProofPage({ id }) {
-  const proof = getProof(id);
-  usePageTitle(proof.statusLabel);
-  if (proof.status === 'not-proven') return <BrokenProof proof={proof} />;
-  if (proof.status === 'proven') return <ProvenProof proof={proof} />;
-  return <RunningProof proof={proof} />;
-}
+function Receipt({ id }) { const state = useProjectCommitment(id); const [technical, setTechnical] = useState(false); usePageTitle(`Commitment #${id} receipt`); return <CommitmentLoading state={state} id={id}>{(c) => { const kept = c.status === 'proven'; return <Shell><main className="container receipt-page"><a href={`/proof/${c.id}`} className="back-link">← Back to proof</a><div className="receipt-heading"><div><Eyebrow>Real Elysium testnet record · Validated Receipt V3</Eyebrow><h1>Commitment <em>#{c.id}.</em></h1></div><div><StatusPill status={c.status} label={c.statusLabel} /><span className="assurance-label">{c.assuranceLabel}</span></div></div><section className="receipt-paper"><Eyebrow>Human summary</Eyebrow><div className="receipt-human-grid"><div><Eyebrow>What was promised</Eyebrow><strong>{c.plainProofType}</strong></div><div><Eyebrow>What Sicher found</Eyebrow><strong>Lowest observed: {c.minimumObserved}</strong></div><div><Eyebrow>Result</Eyebrow><strong>{c.statusLabel}</strong><small>{kept ? 'The promise was kept for the full period.' : 'The balance fell below the promised minimum during the commitment.'}</small></div><div><Eyebrow>Evidence</Eyebrow><strong>{c.assuranceLabel}</strong><small>Checked across multiple sources</small></div></div><div className="receipt-section"><Eyebrow>Wallet balance during the commitment</Eyebrow><ProofStrip proof={stripProof(c)} />{kept ? <p className="receipt-conclusion">The balance stayed at or above the promised minimum.</p> : <p className="receipt-conclusion">The balance recovered. The breach didn’t disappear.</p>}</div></section><section className="technical-section"><button type="button" className="technical-toggle" aria-expanded={technical} onClick={() => setTechnical(!technical)}><span>Technical details</span><span>{technical ? '−' : '+'}</span></button>{technical && <div className="technical-reveal"><div className="technical-grid"><Technical label="Chain ID" value="99801" /><Technical label="Registry" value={REGISTRY_ADDRESS} /><Technical label="Token" value={c.token} /><Technical label="Subject" value={c.subject} /><Technical label="Creator" value={c.creator} /><Technical label="Proof window" value={`${c.startBlock} → ${c.endBlock}`} /><Technical label="Starting balance" value={c.startingBalance} /><Technical label="Final balance" value={c.finalBalance} /><Technical label="Start block hash" value={c.startBlockHash} /><Technical label="End block hash" value={c.endBlockHash} /><Technical label="Evidence block hash" value={c.minimumEvidence.blockHash} /><Technical label="Evidence transaction" value={c.minimumEvidence.transactionHash || 'No transaction hash recorded'} /><Technical label="Evidence/finality" value={`${c.evidenceStatus} / ${c.finalityStatus}`} /><Technical label="Receipt digest" value={c.receiptDigest} /><Technical label="Verifier fingerprint" value={c.provenance.verifierFingerprint} /><Technical label="Core fingerprint" value={c.provenance.coreFingerprint} /><Technical label="Providers" value={c.providers.join(', ')} /></div><CopyButton value={c.receiptDigest} label="Copy receipt digest" /><AssuranceNote commitment={c} /></div>}</section></main></Shell>; }}</CommitmentLoading>; }
+function Technical({ label, value }) { return <div><span>{label}</span><b title={value}>{value}</b></div>; }
 
-function ProofHeader({ proof, children }) {
-  return <Shell><main className={`proof-detail proof-detail-${proof.status}`}><div className="container"><a href="/explore" className="back-link">← All proofs</a><div className="proof-detail-top"><div><Eyebrow>{proof.label} · {getProject(proof.projectId).name}</Eyebrow><h1>{proof.status === 'running' ? <>Proof<br /><em>running.</em></> : proof.status === 'proven' ? <>Quietly<br /><em>proven.</em></> : <>Not<br /><em>proven.</em></>}</h1></div><StatusPill status={proof.status} label={proof.statusLabel} /></div>{children}</div></main></Shell>;
-}
+function About() { usePageTitle('How Sicher works'); const steps = [['01', 'Make a promise.', 'Choose a measurable condition.'], ['02', 'Record it.', 'Anchor measurable terms before the outcome.'], ['03', 'Check the period.', 'Sicher checks the entire block window, not only the end.'], ['04', 'Keep the history.', 'A temporary breach remains a failure after recovery.'], ['05', 'Read the receipt.', 'See the result and the evidence behind it.']]; return <Shell current="about"><main className="about-page"><section className="about-hero container"><Eyebrow>How Sicher works</Eyebrow><h1>Commit.<br /><em>Observe. Prove.</em></h1><p>Make a measurable promise. Sicher records it, checks the period, and shows the result.</p></section><section className="about-steps container">{steps.map(([number, title, body]) => <article className="about-step" key={number}><span>{number}</span><h2>{title}</h2><p>{body}</p></article>)}</section><section className="about-split"><div className="about-split-image about-gradient" aria-hidden="true" /><div className="about-split-copy"><Eyebrow>Real testnet record · Commitment #2</Eyebrow><h2>Recovery does not<br /><em>rewrite history.</em></h2><p>The wallet promised to keep 80,000 STEST. It fell to 15,000 before recovering, so the result is Not proven.</p><a href="/proof/2" className="text-link">See the evidence <Arrow small /></a></div></section><section className="about-disclosures container"><div><Eyebrow>Scope and interpretation</Eyebrow><h2>Read the result precisely.</h2></div><div className="disclosure-grid"><article><h3>Verdict</h3><p>Proven and Not proven describe the evaluated commitment. Proven means the promise held for the full period; Not proven means it was broken. A new active commitment is not automatically Proven, and missing evidence never implies success.</p></article><article><h3>Assurance</h3><p>Corroborated means checked across multiple sources. Corroborated is an assurance level, not a verdict. Correlated upstream omission cannot be mathematically excluded.</p></article><article><h3>Token scope</h3><p>Verification is scoped to conventional ERC-20 Transfer accounting. Rebasing, fee-on-transfer, and other non-conventional models are outside this boundary.</p></article></div></section></main></Shell>; }
+function NotFound() { return <Shell><main className="container not-found"><Eyebrow>Not found</Eyebrow><h1>No validated record<br /><em>exists here.</em></h1><a href="/explore" className="button button-primary">Explore proofs <Arrow /></a></main></Shell>; }
 
-function RunningProof({ proof }) {
-  return <ProofHeader proof={proof}><p className="proof-commitment">“{formatCommitment(proof)}”</p><DetailGrid proof={proof} /><div className="proof-focus running-focus"><div className="focus-label"><Eyebrow>Current position</Eyebrow><span>Day 3 of 7</span></div><div className="big-current">{proof.currentValue}</div><p>Still above the commitment line.</p><Timeline proof={proof} activeIndex={1} /></div><div className="proof-bottom-actions"><a className="button button-primary" href={`/proof/${proof.id}/receipt`}>See proof <Arrow /></a><span>Started by {proof.startedBy}</span></div></ProofHeader>;
-}
-
-function ProvenProof({ proof }) {
-  return <ProofHeader proof={proof}><p className="proof-commitment">“{proof.commitment.replace('Keep', 'Kept').replace(' for', ' for the entire') }”</p><DetailGrid proof={proof} /><div className="proof-focus proven-focus"><div className="proven-symbol">✓</div><Eyebrow>Every check held</Eyebrow><h2>The condition stayed true<br /><em>for the entire {proof.duration}.</em></h2><Timeline proof={proof} activeIndex={1} /></div><div className="proof-bottom-actions"><a className="button button-primary" href={`/proof/${proof.id}/receipt`}>See how this was proven <Arrow /></a><span>Evidence available · {proof.ends}</span></div></ProofHeader>;
-}
-
-function BrokenProof({ proof }) {
-  const [activeIndex, setActiveIndex] = useState(2);
-  return <ProofHeader proof={proof}><p className="proof-commitment">“{proof.commitment}”</p><div className="breach-hero"><div className="breach-copy"><Eyebrow>The commitment was broken</Eyebrow><h2>The funds came back,<br /><em>but the commitment had already been broken.</em></h2><p>{proof.breachCopy}</p><div className="breach-brand-line">The record remembers.</div></div><div className="breach-stamp">NOT<br />PROVEN</div></div><div className="breach-sequence"><div className="breach-sequence-heading"><Eyebrow>Before → during → after</Eyebrow><span>7 day proof window</span></div><ProofStrip proof={proof} interactive activeIndex={activeIndex} onSelect={setActiveIndex} /><div className="breach-moment"><div><Eyebrow>The moment it broke</Eyebrow><strong>{activeIndex === 2 ? proof.breachValue : proof.sequence[activeIndex]}</strong><span>{activeIndex === 2 ? proof.breachDay : activeIndex === 3 ? 'After the breach' : 'Before the breach'}</span></div><p>{activeIndex === 2 ? `This number was below the ${proof.threshold} condition. The later recovery cannot rewrite it.` : 'Sicher keeps the full sequence visible so the context stays intact.'}</p></div></div><div className="proof-bottom-actions"><a className="button button-dark" href={`/proof/${proof.id}/receipt`}>See what happened <Arrow /></a><span>Started by {proof.startedBy}</span></div></ProofHeader>;
-}
-
-function Receipt({ id }) {
-  const proof = getProof(id);
-  const project = getProject(proof.projectId);
-  const [technical, setTechnical] = useState(false);
-  usePageTitle('Receipt');
-  return <Shell><main className="container receipt-page"><a href={`/proof/${proof.id}`} className="back-link">← Back to proof</a><div className="receipt-heading"><div><Eyebrow>Proof receipt · {proof.label}</Eyebrow><h1>A record you can<br /><em>read in plain English.</em></h1></div><StatusPill status={proof.status} label={proof.statusLabel} /></div><section className="receipt-paper"><div className="receipt-project"><span className="project-initials">{project.initials}</span><span><b>{project.name}</b><small>Started by {proof.startedBy}</small></span></div><div className="receipt-section"><Eyebrow>What was promised</Eyebrow><h2>{proof.commitment}</h2></div><div className="receipt-section"><Eyebrow>What happened</Eyebrow><p>{proof.status === 'not-proven' ? proof.breachCopy : proof.status === 'proven' ? `The amount stayed above ${proof.threshold} for all ${proof.duration}.` : `The proof is still running. The current amount is ${proof.currentValue}.`}</p>{proof.status === 'not-proven' && <ProofStrip proof={proof} />}</div><div className="receipt-meta"><div><Eyebrow>{proof.status === 'not-proven' ? 'When it broke' : 'Period'}</Eyebrow><strong>{proof.status === 'not-proven' ? `${proof.breachDay} · ${proof.breachValue}` : proof.duration}</strong></div><div><Eyebrow>When it began</Eyebrow><strong>{proof.started}</strong></div><div><Eyebrow>When it ended</Eyebrow><strong>{proof.status === 'running' ? 'Still proving' : proof.ends}</strong></div></div><div className="receipt-section receipt-starter"><Eyebrow>Who started the proof</Eyebrow><p>{proof.startedBy}</p></div></section><section className="technical-section"><button type="button" className="technical-toggle" onClick={() => setTechnical(!technical)}><span>See technical evidence</span><span>{technical ? '−' : '+'}</span></button>{technical && <div className="technical-reveal"><Eyebrow>For people who want the deeper record</Eyebrow><div className="technical-grid"><div><span>Evidence reference</span><b>demo://sicher/{proof.id}</b></div><div><span>Check cadence</span><b>Continuous during window</b></div><div><span>Record state</span><b>Immutable after start</b></div><div><span>Source</span><b>Demo environment</b></div></div></div>}</section></main></Shell>;
-}
-
-function About() {
-  usePageTitle('How Sicher works');
-  const steps = [
-    ['01', 'A project says what it will do.', 'The condition is written in exact, human words before the outcome is known.'],
-    ['02', 'Sicher keeps checking.', 'The whole promised window stays in view. A temporary drop is not hidden by a later recovery.'],
-    ['03', 'The record tells the truth.', 'At the end, anyone can see whether the exact commitment held — or the moment it broke.']
-  ];
-  return <Shell current="about"><main className="about-page"><section className="about-hero container"><Eyebrow>How Sicher works</Eyebrow><h1>Make the invisible<br /><em>easy to see.</em></h1><p>Trust is not a feeling we add after the fact. It is a record of what was promised, checked across time, and left intact.</p></section><section className="about-steps container">{steps.map(([number, title, body]) => <article className="about-step" key={number}><span>{number}</span><h2>{title}</h2><p>{body}</p></article>)}</section><section className="about-split"><div className="about-split-image"><img src={HERO_IMAGE} alt="Reflected sunlight through transparent materials" /></div><div className="about-split-copy"><Eyebrow>The important part</Eyebrow><h2>What happened in the middle<br /><em>stays part of the story.</em></h2><p>If a promise says “keep at least 80,000 here for 7 days,” then 15,000 on day 3 matters — even if the number returns to 100,000 on day 4.</p><a href="/proof/demo-breach" className="text-link">See the broken proof <Arrow small /></a></div></section><section className="about-end container"><Eyebrow>Built for clarity</Eyebrow><h2>Technical detail is available<br /><em>when you want it.</em></h2><p>Sicher starts with plain English. The deeper evidence is there for people who need to inspect it, not as a barrier to understanding the promise.</p><a href="/explore" className="button button-primary">Explore proofs <Arrow /></a></section></main></Shell>;
-}
-
-function NotFound() { return <Shell><main className="container not-found"><Eyebrow>Nothing here yet</Eyebrow><h1>That page has<br /><em>not been recorded.</em></h1><a href="/" className="button button-primary">Back home <Arrow /></a></main></Shell>; }
-
-function App() {
-  const [route, setRoute] = useState(() => resolveRoute(window.location.pathname));
-  useEffect(() => { const onPop = () => setRoute(resolveRoute(window.location.pathname)); window.addEventListener('popstate', onPop); return () => window.removeEventListener('popstate', onPop); }, []);
-  useEffect(() => { const handleClick = (event) => { const link = event.target.closest('a'); if (!link || link.target === '_blank' || link.origin !== window.location.origin) return; const href = link.getAttribute('href'); if (!href || href.startsWith('#')) return; event.preventDefault(); window.history.pushState({}, '', href); setRoute(resolveRoute(href)); window.scrollTo({ top: 0, behavior: 'smooth' }); }; document.addEventListener('click', handleClick); return () => document.removeEventListener('click', handleClick); }, []);
-  if (route.name === 'home') return <Home />;
-  if (route.name === 'explore') return <Explore />;
-  if (route.name === 'project') return <ProjectPage id={route.id} />;
-  if (route.name === 'start') return <StartProof />;
-  if (route.name === 'proof') return <ProofPage id={route.id} />;
-  if (route.name === 'receipt') return <Receipt id={route.id} />;
-  if (route.name === 'about') return <About />;
-  return <NotFound />;
-}
-
-createRoot(document.getElementById('root')).render(<App />);
+function App() { const [route, setRoute] = useState(() => resolveRoute(window.location.pathname)); useEffect(() => { const onPop = () => setRoute(resolveRoute(window.location.pathname)); window.addEventListener('popstate', onPop); return () => window.removeEventListener('popstate', onPop); }, []); useEffect(() => { const handle = (event) => { const link = event.target.closest('a'); if (!link || link.target === '_blank' || link.origin !== window.location.origin) return; const href = link.getAttribute('href'); if (!href || href.startsWith('#')) return; event.preventDefault(); window.history.pushState({}, '', href); setRoute(resolveRoute(href)); window.scrollTo({ top: 0, behavior: 'smooth' }); }; document.addEventListener('click', handle); return () => document.removeEventListener('click', handle); }, []); if (route.name === 'home') return <Home />; if (route.name === 'explore') return <Explore />; if (route.name === 'project') return <ProjectPage id={route.id} />; if (route.name === 'start') return <StartProof />; if (route.name === 'proof') return <ProofPage id={route.id} />; if (route.name === 'receipt') return <Receipt id={route.id} />; if (route.name === 'about') return <About />; return <NotFound />; }
+createRoot(document.getElementById('root')).render(<WalletProvider><App /></WalletProvider>);

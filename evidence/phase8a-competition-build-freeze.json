@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "sicher.competition-build-freeze/1.0",
+  "timestamp": "2026-10-14T07:39:49-01:00",
+  "network": {
+    "name": "Elysium Testnet",
+    "chainId": "99801",
+    "registryAddress": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+    "stestAddress": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7"
+  },
+  "frozenIntegrity": {
+    "contractFingerprint": "736bab2d6f0c88c1575cb1befb5cf812b399055beda24868b651a0cf12cd5e09",
+    "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379"
+  },
+  "receipts": {
+    "1": {
+      "proofResult": "PROVEN",
+      "assuranceLevel": "CORROBORATED",
+      "digest": "2b1fa85d2dbd00729218bbe09d327cfc2349f20df02921185d8a2ec3c43fbece"
+    },
+    "2": {
+      "proofResult": "NOT_PROVEN",
+      "assuranceLevel": "CORROBORATED",
+      "digest": "bd8e5cfa63ff862d4e0b1efc93c6ae2ac0800b01b6806a5ea5146880ce1b67f7"
+    },
+    "6": {
+      "proofResult": "PROVEN",
+      "assuranceLevel": "CORROBORATED",
+      "digest": "69f940f6d3e32f51b76729940ccc8179fe84c32e18b8cd3271ad1a3318570b5e"
+    },
+    "7": {
+      "proofResult": "PROVEN",
+      "assuranceLevel": "CORROBORATED",
+      "digest": "83fd128e0caee62acb16da072a0453ef2488c4afb7392720a65b9b6c6dcc3137"
+    }
+  },
+  "validation": {
+    "receiptV3": "PASS",
+    "backendFrozenTests": { "status": "PASS", "tests": 207, "failed": 0, "skipped": 0 },
+    "phase7FunctionalTests": { "status": "PASS", "tests": 81, "failed": 0, "skipped": 0 },
+    "brandTests": { "status": "PASS", "tests": 12, "failed": 0, "skipped": 0 },
+    "contentDensityTests": { "status": "PASS", "tests": 10, "failed": 0, "skipped": 0 },
+    "newcomerTests": { "status": "PASS", "tests": 10, "failed": 0, "skipped": 0 },
+    "heroTests": { "status": "PASS", "tests": 6, "failed": 0, "skipped": 0 },
+    "phase7d1Tests": { "status": "PASS", "tests": 11, "failed": 0, "skipped": 0 },
+    "phase7d2Tests": { "status": "PASS", "tests": 11, "failed": 0, "skipped": 0 },
+    "phase7d2bTests": { "status": "PASS", "tests": 7, "failed": 0, "skipped": 0 },
+    "phase7d4Tests": { "status": "PASS", "tests": 16, "failed": 0, "skipped": 0 },
+    "typecheck": "PASS",
+    "frontendProductionBuild": "PASS",
+    "secretScan": "PASS"
+  },
+  "deployment": {
+    "performedDuringPhase8A": false
+  }
+}

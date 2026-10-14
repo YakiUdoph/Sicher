@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "sicher.frontend.verified-commitments/1.0",
+  "commitments": {
+    "1": {
+      "schemaVersion": "sicher.frontend.verified-commitment/1.0",
+      "id": "1",
+      "proofResult": "PROVEN",
+      "proofStatusLabel": "Proven",
+      "assuranceLevel": "CORROBORATED",
+      "assuranceLabel": "Corroborated",
+      "creator": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+      "tokenSymbol": "STEST",
+      "tokenDecimals": 18,
+      "proofType": "MIN_BALANCE",
+      "minimumRequiredBaseUnits": "80000000000000000000000",
+      "minimumRequiredFormatted": "80,000 STEST",
+      "minimumObservedBaseUnits": "92000000000000000000000",
+      "minimumObservedFormatted": "92,000 STEST",
+      "startingBalanceBaseUnits": "100000000000000000000000",
+      "startingBalanceFormatted": "100,000 STEST",
+      "finalBalanceBaseUnits": "92000000000000000000000",
+      "finalBalanceFormatted": "92,000 STEST",
+      "startBlock": "8126584",
+      "startBlockHash": "0x42de643ba40a37facc8b45423400a3fddf1430176c44ef161295c86a6c534eb4",
+      "endBlock": "8141584",
+      "endBlockHash": "0x21378b2ec1b8689c1a38188984fc853bf6c7750e304d4d86283f25f1580fe6a1",
+      "windowStatus": "COMPLETE",
+      "breachStatus": "NOT_OBSERVED",
+      "evidenceStatus": "COMPLETE",
+      "finalityStatus": "FINALIZED",
+      "minimumCausingEvidence": {
+        "blockNumber": "8128179",
+        "blockHash": "0xf6f842b43702a45123ee5e6e0a532a2a8f61f9d837c9a10d370ced0d7c5ba6c1",
+        "transactionHash": "0x91db23265c455265dd384deb96613266d12939417ef1992b39c1f35eecb4b621",
+        "transactionIndex": 2,
+        "logIndex": 0
+      },
+      "receiptDigest": "2b1fa85d2dbd00729218bbe09d327cfc2349f20df02921185d8a2ec3c43fbece",
+      "limitations": [
+        "Historical event evidence was corroborated across configured operators. Correlated omission across shared upstream infrastructure cannot be mathematically excluded.",
+        "Hypedexer and Conduit are separately operated RPC services but share Elysium sequencer, AnyTrust data-availability, HyperEVM settlement, and Nitro lineage dependencies; corroboration does not guarantee history completeness.",
+        "Targeted transaction-receipt checks prove discovered events are genuine; they do not prove an undiscovered event was not omitted.",
+        "Start/end balances and sparse checkpoints do not prove absence of an omitted temporary breach.",
+        "This local digest is not a signature or immutable anchor."
+      ],
+      "providers": [
+        "hypedexer",
+        "conduit"
+      ],
+      "pathBaseUnits": [
+        "100000000000000000000000",
+        "92000000000000000000000"
+      ],
+      "pathFormatted": [
+        "100,000 STEST",
+        "92,000 STEST"
+      ],
+      "pathProvenance": {
+        "validated": true,
+        "method": "FROZEN_RECONSTRUCTION_CORE",
+        "sources": [
+          "evidence/phase6b2-commitment1-receipt-v3.json",
+          "scripts/min-balance-core.ts"
+        ]
+      },
+      "provenance": {
+        "frozenBackendCommit": "8110370f95384691bd379d55207a20e73677609f",
+        "freezeVersion": "sicher.competition-verifier-freeze/1.0",
+        "receiptArtifact": "evidence/phase6b2-commitment1-receipt-v3.json",
+        "evidenceManifestDigest": "ca0afa95ce2c6292065c57e79c4ec03ae8e9940c8fe769cdb5819d31c89db696",
+        "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
+        "coreFingerprint": "2c7ed9c6624db964a247d28c327afc9a4633a6699e2d9d05ad35cf21859649a6"
+      }
+    },
+    "2": {
+      "schemaVersion": "sicher.frontend.verified-commitment/1.0",
+      "id": "2",
+      "proofResult": "NOT_PROVEN",
+      "proofStatusLabel": "Not proven",
+      "assuranceLevel": "CORROBORATED",
+      "assuranceLabel": "Corroborated",
+      "creator": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+      "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+      "tokenSymbol": "STEST",
+      "tokenDecimals": 18,
+      "proofType": "MIN_BALANCE",
+      "minimumRequiredBaseUnits": "80000000000000000000000",
+      "minimumRequiredFormatted": "80,000 STEST",
+      "minimumObservedBaseUnits": "15000000000000000000000",
+      "minimumObservedFormatted": "15,000 STEST",
+      "startingBalanceBaseUnits": "100000000000000000000000",
+      "startingBalanceFormatted": "100,000 STEST",
+      "finalBalanceBaseUnits": "100000000000000000000000",
+      "finalBalanceFormatted": "100,000 STEST",
+      "startBlock": "8220689",
+      "startBlockHash": "0x9a09875b68d0bbe2619bd243abbdefce9c91918a734c44ffdd2ce76fe1bc2173",
+      "endBlock": "8520689",
+      "endBlockHash": "0x36d20b9837272bf19a84cd107204fac118835f5f19d85faaa8e45c8eae2cdcd9",
+      "windowStatus": "COMPLETE",
+      "breachStatus": "OBSERVED",
+      "evidenceStatus": "COMPLETE",
+      "finalityStatus": "FINALIZED",
+      "minimumCausingEvidence": {
+        "blockNumber": "8425736",
+        "blockHash": "0xe5797bfebcdb14b2d0adc80d1e4ac49909d95fd76247e43f10e9b40347ef820a",
+        "transactionHash": "0x2ad4aa32c27551c0dbe1795e94dd1b49bb1caf01b9e67e978a8c16912a2ef148",
+        "transactionIndex": 1,
+        "logIndex": 0
+      },
+      "receiptDigest": "bd8e5cfa63ff862d4e0b1efc93c6ae2ac0800b01b6806a5ea5146880ce1b67f7",
+      "limitations": [
+        "Historical event evidence was corroborated across configured operators. Correlated omission across shared upstream infrastructure cannot be mathematically excluded.",
+        "Hypedexer and Conduit are separately operated RPC services but share Elysium sequencer, AnyTrust data-availability, HyperEVM settlement, and Nitro lineage dependencies; corroboration does not guarantee history completeness.",
+        "Targeted transaction-receipt checks prove discovered events are genuine; they do not prove an undiscovered event was not omitted.",
+        "Start/end balances and sparse checkpoints do not prove absence of an omitted temporary breach.",
+        "This local digest is not a signature or immutable anchor."
+      ],
+      "providers": [
+        "hypedexer",
+        "conduit"
+      ],
+      "pathBaseUnits": [
+        "100000000000000000000000",
+        "92000000000000000000000",
+        "15000000000000000000000",
+        "100000000000000000000000"
+      ],
+      "pathFormatted": [
+        "100,000 STEST",
+        "92,000 STEST",
+        "15,000 STEST",
+        "100,000 STEST"
+      ],
+      "pathProvenance": {
+        "validated": true,
+        "method": "FROZEN_PHASE5_PHASE6_CROSSCHECK",
+        "sources": [
+          "evidence/phase6b2-commitment2-receipt-v3.json",
+          "evidence/phase6b2-phase5-phase6-crosscheck.json",
+          "scripts/min-balance-core.ts"
+        ]
+      },
+      "provenance": {
+        "frozenBackendCommit": "8110370f95384691bd379d55207a20e73677609f",
+        "freezeVersion": "sicher.competition-verifier-freeze/1.0",
+        "receiptArtifact": "evidence/phase6b2-commitment2-receipt-v3.json",
+        "evidenceManifestDigest": "bd0d0dc77e997caae72f4d8a22cea98a8dbb66cb3790b059f48fe74c7b8fbbea",
+        "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
+        "coreFingerprint": "2c7ed9c6624db964a247d28c327afc9a4633a6699e2d9d05ad35cf21859649a6"
+      }
+    }
+  }
+}

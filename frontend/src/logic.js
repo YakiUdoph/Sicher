@@ -10,19 +10,11 @@ export function resolveRoute(pathname) {
   if (proof) return { name: 'proof', id: proof[1] };
   const project = clean.match(/^\/project\/([^/]+)$/);
   if (project) return { name: 'project', id: project[1] };
-  return { name: 'home' };
-}
-
-export function formatCommitment(proof) {
-  return proof?.commitment || 'A measurable commitment with a clear time window.';
+  return { name: 'not-found' };
 }
 
 export function statusTone(status) {
   if (status === 'proven') return 'green';
   if (status === 'not-proven') return 'coral';
   return 'blue';
-}
-
-export function statusPath(status) {
-  return status === 'running' ? 'running' : status === 'proven' ? 'proven' : 'not-proven';
 }

@@ -1,0 +1,180 @@
+{
+  "evidenceManifest": {
+    "schemaVersion": "sicher.phase6.evidence-manifest/2.0",
+    "chainId": "99801",
+    "registryAddress": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+    "commitmentId": "7",
+    "inclusiveInterval": {
+      "startBlock": "8726278",
+      "evidenceThroughBlock": "8729278",
+      "endBlock": "8729278"
+    },
+    "startingBalanceContext": {
+      "blockNumber": "8726277",
+      "blockHash": "0x417b4836359b24601e53d9a5322c222ec2e8ef69552c62399b554957fdd1bb0d",
+      "meaning": "balance immediately before the inclusive proof window"
+    },
+    "criticalBlockHashes": {
+      "startBlockHash": "0xd525dc17ddb0a08bdad9b326a6b41ffbffbdebce1089a8a2af0c7d953e34b4d0",
+      "endBlockHash": "0xf8a776e3dc1905db593c7e595bfa88f1fbc535af516ce0ba1bea4be23981f8f9",
+      "minimumCausingBlock": "8726277",
+      "minimumCausingBlockHash": "0x417b4836359b24601e53d9a5322c222ec2e8ef69552c62399b554957fdd1bb0d"
+    },
+    "finalizedHeads": [
+      {
+        "provider": "conduit",
+        "blockNumber": "8878472",
+        "blockHash": "0x46261b6d889c02ada7bcad288fbdcdb8fcea517ff72d74ad9e0fe6214854985b"
+      },
+      {
+        "provider": "hypedexer",
+        "blockNumber": "8878472",
+        "blockHash": "0x46261b6d889c02ada7bcad288fbdcdb8fcea517ff72d74ad9e0fe6214854985b"
+      }
+    ],
+    "providers": [
+      {
+        "id": "conduit",
+        "endpoint": "https://rpc-elysium-testnet.t.conduit.xyz"
+      },
+      {
+        "id": "hypedexer",
+        "endpoint": "https://elysium-testnet-rpc.hypedexer.com"
+      }
+    ],
+    "providerIndependence": "PARTIAL_DISTINCT_OPERATORS_SHARED_UPSTREAM",
+    "ranges": [
+      {
+        "provider": "conduit",
+        "fromBlock": "8726278",
+        "toBlock": "8729278",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "provider": "hypedexer",
+        "fromBlock": "8726278",
+        "toBlock": "8729278",
+        "status": "SUCCESS",
+        "logCount": 0,
+        "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    ],
+    "logQueryCoverageComplete": true,
+    "logQueryConsensus": true,
+    "requestedAssuranceLevel": "CORROBORATED",
+    "achievedAssuranceLevel": "CORROBORATED",
+    "discoveredEventReceiptChecks": {
+      "complete": true,
+      "reason": "Every discovered event is present with identical metadata in each configured provider's transaction receipt.",
+      "eventsChecked": 0,
+      "checksPerformed": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "errors": []
+    },
+    "receiptDerivedEvidence": {
+      "method": "eth_getBlockReceipts",
+      "complete": false,
+      "consensus": false,
+      "crossChannelConsensus": false,
+      "blocksRequired": "3001",
+      "configuredMaximumBlocks": "1000",
+      "rpcRequests": 0,
+      "errors": []
+    },
+    "boundaryHashConsensus": true,
+    "startingBalanceConsensus": true,
+    "endingBalanceConsensus": true,
+    "pinnedEndBalance": "100000000000000000000000",
+    "warning": "Start/end balance consistency does not prove absence of an omitted temporary breach.",
+    "orderedRelevantEvidence": []
+  },
+  "receipt": {
+    "verifierVersion": "sicher-phase6-competition-verifier/3.0.0",
+    "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
+    "chainId": "99801",
+    "registryAddress": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+    "commitmentId": "7",
+    "proofResult": "PROVEN",
+    "assuranceLevel": "CORROBORATED",
+    "coreFingerprint": "2c7ed9c6624db964a247d28c327afc9a4633a6699e2d9d05ad35cf21859649a6",
+    "creator": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+    "subject": "0xa8087Fbd0AEF6b623d5e00B1733D1D9f8136A086",
+    "token": "0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7",
+    "proofType": "MIN_BALANCE",
+    "minimumRequiredBaseUnits": "80000000000000000000000",
+    "tokenDecimals": 18,
+    "startBlock": "8726278",
+    "startBlockHash": "0xd525dc17ddb0a08bdad9b326a6b41ffbffbdebce1089a8a2af0c7d953e34b4d0",
+    "endBlock": "8729278",
+    "endBlockHash": "0xf8a776e3dc1905db593c7e595bfa88f1fbc535af516ce0ba1bea4be23981f8f9",
+    "startingBalanceBaseUnits": "100000000000000000000000",
+    "minimumObservedBaseUnits": "100000000000000000000000",
+    "finalBalanceBaseUnits": "100000000000000000000000",
+    "minimumCausingEvidence": {
+      "blockNumber": "8726277",
+      "blockHash": "0x417b4836359b24601e53d9a5322c222ec2e8ef69552c62399b554957fdd1bb0d",
+      "transactionHash": null,
+      "transactionIndex": null,
+      "logIndex": null
+    },
+    "windowStatus": "COMPLETE",
+    "breachStatus": "NOT_OBSERVED",
+    "evidenceStatus": "COMPLETE",
+    "finalityStatus": "FINALIZED",
+    "providers": [
+      {
+        "id": "hypedexer",
+        "endpoint": "https://elysium-testnet-rpc.hypedexer.com"
+      },
+      {
+        "id": "conduit",
+        "endpoint": "https://rpc-elysium-testnet.t.conduit.xyz"
+      }
+    ],
+    "providerAgreement": {
+      "logEvidence": true,
+      "discoveredReceiptChecks": true,
+      "exhaustiveReceiptEvidence": null,
+      "startingBalance": true,
+      "endingBalance": true,
+      "criticalBlockHashes": true,
+      "finalizedHead": true
+    },
+    "logRangeCoverage": {
+      "complete": true,
+      "chunks": 2,
+      "successfulChunks": 2,
+      "fromBlock": "8726278",
+      "toBlock": "8729278",
+      "retries": 0
+    },
+    "discoveredEventReceiptChecks": {
+      "complete": true,
+      "eventsChecked": 0,
+      "checksPerformed": 0,
+      "digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "exhaustiveReceiptVerification": {
+      "requested": false,
+      "completed": false,
+      "blocksVerified": "0",
+      "totalBlocks": "3001",
+      "progressDigest": null
+    },
+    "finalizedBlock": "8878472",
+    "finalizedBlockHash": "0x46261b6d889c02ada7bcad288fbdcdb8fcea517ff72d74ad9e0fe6214854985b",
+    "evidenceManifestDigest": "7770dcb204e3abecbd40d3f698b9e5065c647a1c0286c4d06a002328404b4105",
+    "limitations": [
+      "Historical event evidence was corroborated across configured operators. Correlated omission across shared upstream infrastructure cannot be mathematically excluded.",
+      "Hypedexer and Conduit are separately operated RPC services but share Elysium sequencer, AnyTrust data-availability, HyperEVM settlement, and Nitro lineage dependencies; corroboration does not guarantee history completeness.",
+      "Targeted transaction-receipt checks prove discovered events are genuine; they do not prove an undiscovered event was not omitted.",
+      "Start/end balances and sparse checkpoints do not prove absence of an omitted temporary breach.",
+      "This local digest is not a signature or immutable anchor."
+    ],
+    "schemaVersion": "sicher.competition-receipt/3.0",
+    "canonicalSerialization": "Lexicographic JSON object keys; provider/evidence arrays normalized; integers encoded as base-10 strings; UTF-8; receiptDigest omitted while hashing",
+    "receiptDigest": "83fd128e0caee62acb16da072a0453ef2488c4afb7392720a65b9b6c6dcc3137"
+  }
+}
