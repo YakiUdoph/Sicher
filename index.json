@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "sicher.public-result-index/1.0",
+  "chainId": "99801",
+  "registryAddress": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+  "automation": {
+    "operational": false
+  },
+  "results": {
+    "1": {
+      "chainId": "99801",
+      "registryAddress": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+      "commitmentId": "1",
+      "receiptDigest": "2b1fa85d2dbd00729218bbe09d327cfc2349f20df02921185d8a2ec3c43fbece",
+      "documentDigest": "bfa542307edf140442db27bb3b31edfb3fe4422bf48013515662eed0b969508f",
+      "proofResult": "PROVEN",
+      "assuranceLevel": "CORROBORATED",
+      "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
+      "receiptPath": "receipts/99801/0x4e4887e28a8370678a9a37c08a85c65450b510c0/1/2b1fa85d2dbd00729218bbe09d327cfc2349f20df02921185d8a2ec3c43fbece.json",
+      "publishedAt": "2026-10-15T13:30:35.292Z"
+    },
+    "2": {
+      "chainId": "99801",
+      "registryAddress": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+      "commitmentId": "2",
+      "receiptDigest": "bd8e5cfa63ff862d4e0b1efc93c6ae2ac0800b01b6806a5ea5146880ce1b67f7",
+      "documentDigest": "c60fc94e342cb485b70558e726a7de8aa870942377036ae0d3bd569dcc956e39",
+      "proofResult": "NOT_PROVEN",
+      "assuranceLevel": "CORROBORATED",
+      "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
+      "receiptPath": "receipts/99801/0x4e4887e28a8370678a9a37c08a85c65450b510c0/2/bd8e5cfa63ff862d4e0b1efc93c6ae2ac0800b01b6806a5ea5146880ce1b67f7.json",
+      "publishedAt": "2026-10-15T13:30:35.292Z"
+    }
+  }
+}
