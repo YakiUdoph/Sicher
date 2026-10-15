@@ -43,6 +43,7 @@ jobs:
           mkdir .phase10b-baseline
           cp .phase10b-results/index.json .phase10b-baseline/index.json
           cp -R .phase10b-results/receipts .phase10b-baseline/receipts
+          if [ -f .phase10b-results/scheduler.json ]; then cp .phase10b-results/scheduler.json .phase10b-baseline/scheduler.json; fi
           echo "PHASE10B_EXPECTED_TARGET_SHA=$(git -C .phase10b-results rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
@@ -68,7 +69,7 @@ jobs:
       - name: Detect publication change
         id: publication_change
         run: |
-          if [ -z "$(git -C .phase10b-results status --porcelain -- index.json receipts)" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+          if [ -z "$(git -C .phase10b-results status --porcelain -- index.json scheduler.json receipts)" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
       - name: Validate publication transition
         if: steps.publication_change.outputs.changed == 'true'
         env:
@@ -84,9 +85,9 @@ jobs:
           git switch -c "$PUBLICATION_BRANCH"
           git config user.name "sicher-result-publisher"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -- index.json receipts
+          git add -- index.json scheduler.json receipts
           git diff --cached --check
-          git commit -m "chore(results): publish verified terminal result"
+          git commit -m "chore(results): advance protected publication state"
           git push --set-upstream origin "$PUBLICATION_BRANCH"
           echo "PHASE10B_TEMPORARY_BRANCH=$PUBLICATION_BRANCH" >> "$GITHUB_ENV"
           echo "PHASE10B_EXPECTED_HEAD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"

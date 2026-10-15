@@ -16,4 +16,28 @@ Publication remains disabled until the repository owner completes and verifies t
 
 The workflow has no pull-request trigger, processes at most one result per run, serializes runs, refuses an inactive or unbootstrapped store, and never pushes directly to the protected results branch. It opens a temporary branch and PR, re-reads both pinned heads and the complete store, validates the changed-file allowlist, squash-merges, verifies the resulting head, and removes the temporary branch. A missing or malformed runtime store is fail-closed.
 
-The write-capable `publish` job is bound to the `sicher-result-publication` environment. Scheduled runs retain generic lowest-eligible-ID selection. A manual dispatch may optionally supply one canonical positive `commitment_id`; this only narrows selection to that registry record. The record must still exist, be ended at the agreed finalized head, use STEST, remain unpublished, and pass the unchanged dual-provider, frozen-verifier, Receipt V3, protected-PR, and one-result publication gates.
+The write-capable `publish` job is bound to the `sicher-result-publication` environment. Scheduled runs use the generic persisted fair scheduler described below. A manual dispatch may optionally supply one canonical positive `commitment_id`; this only narrows selection to that registry record. The record must still exist, be ended at the agreed finalized head, use STEST, remain unpublished, and pass the unchanged dual-provider, frozen-verifier, Receipt V3, protected-PR, and one-result publication gates.
+
+## Fair scheduler state
+
+Normal scheduled operation uses `scheduler.json` in the protected result store. The file has schema `sicher.result-scheduler/1.0` and contains only operational metadata:
+
+- `cursorAfterId`: the last attempted commitment ID;
+- `failures`: per-ID attempt count, `TRANSIENT` or `UNRESOLVED` classification, a bounded diagnostic code, last-attempt time, and next-attempt time;
+- `scanIssues`: current per-ID read/disagreement diagnostics.
+
+It contains no receipt, proof verdict, assurance claim, or immutable commitment term. A scheduler entry never means `PROVEN` or `NOT_PROVEN`.
+
+The generic selector starts after the cursor, wraps numerically, skips published, unsupported-token, active, unfinalized, and not-yet-due retry records, and attempts at most one candidate per run. The cursor advances after both success and failure, so one unresolved ID cannot starve later IDs. Transient failures retry after 6, 12, then at most 24 hours. Deterministic or repeatedly unresolved failures retry every seven days; an explicit manual target may request an earlier re-evaluation but still passes every eligibility, provider, verifier, Receipt V3, fingerprint, first-publication-wins, and protected-PR check.
+
+Chain identity, the agreed finalized head, and the agreed registry upper bound remain global fail-closed invariants. A failure or disagreement while reading one commitment is isolated to that ID, recorded diagnostically, and never accepted from only one provider. Independently agreed later IDs remain schedulable.
+
+Scheduler-only progress and scheduler-plus-one-result progress both use a temporary branch, validated pull request, squash merge, and post-merge head verification. Ordinary transitions cannot change activation state, existing results, or existing receipts. A successful result must atomically advance the scheduler; a failed attempt may change only `scheduler.json`.
+
+The scanner and browser retain a deliberate 10,000-record safety ceiling and fail closed above it. This is sufficient for the current competition/demo scale but is not an unlimited indexing architecture.
+
+Production frontend runtime discovery requires this public build-time Config variable and one controlled redeployment:
+
+`VITE_SICHER_RESULTS_BASE_URL=https://raw.githubusercontent.com/YakiUdoph/Sicher/sicher-results`
+
+After that deployment, each browser load fetches `index.json` and content-addressed receipt paths with `cache: no-store`; individual result publications require no frontend source edit or redeployment.

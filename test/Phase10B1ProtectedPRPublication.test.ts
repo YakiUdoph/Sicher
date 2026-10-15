@@ -6,6 +6,7 @@ import test from "node:test";
 import { validateVerifiedCommitmentsDocument } from "../frontend/src/verifiedCommitments.ts";
 import { validateVerifierResult, type PublicResultDocument, type PublicResultEntry, type PublicResultIndex } from "../scripts/phase10b-publication.ts";
 import { publishThroughProtectedPullRequest, validatePublicationTransition, validatePullRequestState, validateStoreSnapshot, type GitHubPublicationApi, type StoreSnapshot } from "../scripts/phase10b-pr-publication.ts";
+import { emptySchedulerState, SCHEDULER_PATH, validateSchedulerState } from "../scripts/phase10b-scheduler.ts";
 
 const ROOT = resolve(import.meta.dirname, "..");
 const prepared = validateVerifiedCommitmentsDocument(JSON.parse(readFileSync(resolve(ROOT, "frontend/public/data/commitments.json"), "utf8")));
@@ -15,10 +16,11 @@ function store(ids: Array<"1" | "2">, operational = false): StoreSnapshot {
   const results: Record<string, PublicResultEntry> = {}; const files = new Map<string, string>();
   for (const id of ids) { const receipt = documents[id].envelope.receipt; const receiptPath = `receipts/99801/0x4e4887e28a8370678a9a37c08a85c65450b510c0/${id}/${receipt.receiptDigest}.json`; results[id] = { chainId: "99801", registryAddress: receipt.registryAddress, commitmentId: id, receiptDigest: receipt.receiptDigest, documentDigest: documents[id].documentDigest, receiptPath, proofResult: receipt.proofResult as "PROVEN" | "NOT_PROVEN", assuranceLevel: receipt.assuranceLevel, verifierFingerprint: receipt.verifierFingerprint, publishedAt: "2026-01-01T00:00:00.000Z" }; files.set(receiptPath, `${JSON.stringify(documents[id], null, 2)}\n`); }
   const index: PublicResultIndex = { schemaVersion: "sicher.public-result-index/1.0", chainId: "99801", registryAddress: documents["1"].envelope.receipt.registryAddress, automation: { operational }, results };
-  files.set("index.json", `${JSON.stringify(index, null, 2)}\n`); return validateStoreSnapshot(index, files);
+  const scheduler = validateSchedulerState({ ...emptySchedulerState(), cursorAfterId: ids.at(-1) ?? "0" });
+  files.set("index.json", `${JSON.stringify(index, null, 2)}\n`); files.set(SCHEDULER_PATH, `${JSON.stringify(scheduler, null, 2)}\n`); return validateStoreSnapshot(index, files);
 }
 const empty = store([]); const one = store(["1"]); const both = store(["1", "2"]);
-function pull(overrides: Partial<{ target: string; head: string; files: string[] }> = {}) { return { expectedTargetSha: "base", currentTargetSha: overrides.target ?? "base", expectedHeadSha: "head", pull: { number: 7, baseSha: overrides.target ?? "base", headSha: overrides.head ?? "head", changedFiles: overrides.files ?? ["index.json", one.index.results["1"].receiptPath] }, before: empty, after: one }; }
+function pull(overrides: Partial<{ target: string; head: string; files: string[] }> = {}) { return { expectedTargetSha: "base", currentTargetSha: overrides.target ?? "base", expectedHeadSha: "head", pull: { number: 7, baseSha: overrides.target ?? "base", headSha: overrides.head ?? "head", changedFiles: overrides.files ?? ["index.json", SCHEDULER_PATH, one.index.results["1"].receiptPath] }, before: empty, after: one }; }
 
 test("1 active workflow contains no direct push to sicher-results", () => { const source = readFileSync(resolve(ROOT, ".github/workflows/phase10b-publish-results.yml"), "utf8"); assert.doesNotMatch(source, /git push[^\n]*sicher-results(?:\s|$)/); assert.match(source, /git push --set-upstream origin "\$PUBLICATION_BRANCH"/); });
 test("2 malicious extra PR file is rejected", () => { const files = new Map(one.files); files.set("evil.json", "{}"); assert.throws(() => validateStoreSnapshot(one.index, files), /unexpected/); });
@@ -45,5 +47,5 @@ test("21 temporary branch cleanup failure is reported", async () => { const api 
 function mockApi(hooks: { merge?: boolean; preOpenTarget?: string; opened?: () => void; closed?: () => void; deleted?: () => void; deleteError?: Error }): GitHubPublicationApi {
   let merged = false;
   let branchReads = 0;
-  return { getBranchHead: async () => { branchReads += 1; return merged ? "merge" : branchReads === 1 && hooks.preOpenTarget ? hooks.preOpenTarget : "base"; }, loadStore: async (sha) => sha === "base" ? empty : one, openPullRequest: async () => { hooks.opened?.(); return 7; }, getPullRequest: async () => ({ number: 7, baseSha: "base", headSha: "head", changedFiles: ["index.json", one.index.results["1"].receiptPath] }), mergePullRequest: async () => { if (hooks.merge === false) return { merged: false, sha: "" }; merged = true; return { merged: true, sha: "merge" }; }, closePullRequest: async () => { hooks.closed?.(); }, deleteBranch: async () => { if (hooks.deleteError) throw hooks.deleteError; hooks.deleted?.(); } };
+  return { getBranchHead: async () => { branchReads += 1; return merged ? "merge" : branchReads === 1 && hooks.preOpenTarget ? hooks.preOpenTarget : "base"; }, loadStore: async (sha) => sha === "base" ? empty : one, openPullRequest: async () => { hooks.opened?.(); return 7; }, getPullRequest: async () => ({ number: 7, baseSha: "base", headSha: "head", changedFiles: ["index.json", SCHEDULER_PATH, one.index.results["1"].receiptPath] }), mergePullRequest: async () => { if (hooks.merge === false) return { merged: false, sha: "" }; merged = true; return { merged: true, sha: "merge" }; }, closePullRequest: async () => { hooks.closed?.(); }, deleteBranch: async () => { if (hooks.deleteError) throw hooks.deleteError; hooks.deleted?.(); } };
 }

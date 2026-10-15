@@ -3,11 +3,13 @@ import type { RegistryCommitment, RegistrySnapshot } from "../frontend/src/regis
 import type { PublicResultIndex } from "./phase10b-publication.ts";
 import { decodeFunctionResult, encodeFunctionData, getAddress } from "viem";
 import { COMPETITION_CHAIN_ID, COMPETITION_REGISTRY } from "./phase6-evidence-core.ts";
+import type { IsolatedRegistrySnapshot, IsolatedScanIssue } from "./phase10b-scheduler.ts";
 
 const ABI = [
   { type: "function", name: "nextCommitmentId", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
   { type: "function", name: "commitments", stateMutability: "view", inputs: [{ name: "id", type: "uint256" }], outputs: [{ name: "id", type: "uint256" }, { name: "creator", type: "address" }, { name: "subject", type: "address" }, { name: "token", type: "address" }, { name: "minimumBalance", type: "uint256" }, { name: "startBlock", type: "uint256" }, { name: "endBlock", type: "uint256" }] },
 ] as const;
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 async function rpc(url: string, method: string, params: unknown[]): Promise<unknown> {
   const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }), signal: AbortSignal.timeout(20_000) });
@@ -17,7 +19,7 @@ async function rpc(url: string, method: string, params: unknown[]): Promise<unkn
   return body.result;
 }
 
-export async function scanFinalizedRegistry(providerUrls: readonly [string, string]): Promise<RegistrySnapshot> {
+export async function scanFinalizedRegistry(providerUrls: readonly [string, string]): Promise<IsolatedRegistrySnapshot> {
   if (providerUrls[0] === providerUrls[1]) throw new Error("Two distinct provider URLs are required.");
   const chains = await Promise.all(providerUrls.map((url) => rpc(url, "eth_chainId", [])));
   if (chains.some((value) => BigInt(String(value)) !== BigInt(COMPETITION_CHAIN_ID))) throw new Error("Registry scanner chain mismatch.");
@@ -30,20 +32,27 @@ export async function scanFinalizedRegistry(providerUrls: readonly [string, stri
   const next = decodeFunctionResult({ abi: ABI, functionName: "nextCommitmentId", data: nextRaw[0] });
   if (next < 1n || next - 1n > 10_000n) throw new Error("Registry bound is invalid or exceeds the scanner limit.");
   const commitments: RegistryCommitment[] = [];
+  const issues: IsolatedScanIssue[] = [];
   for (let id = 1n; id < next; id += 1n) {
-    const data = encodeFunctionData({ abi: ABI, functionName: "commitments", args: [id] }); const raw = await callBoth(data); if (raw[0] !== raw[1]) throw new Error(`Registry commitment #${id} disagreement.`);
-    const decoded = decodeFunctionResult({ abi: ABI, functionName: "commitments", data: raw[0] });
-    if (decoded[0] !== id) throw new Error(`Registry commitment #${id} malformed.`);
-    commitments.push(Object.freeze({ id: id.toString(), creator: getAddress(decoded[1]), subject: getAddress(decoded[2]), token: getAddress(decoded[3]), minimumBalanceBaseUnits: decoded[4].toString(), startBlock: decoded[5].toString(), endBlock: decoded[6].toString() }));
+    const data = encodeFunctionData({ abi: ABI, functionName: "commitments", args: [id] });
+    let raw: readonly [`0x${string}`, `0x${string}`];
+    try { raw = await callBoth(data) as [`0x${string}`, `0x${string}`]; }
+    catch { issues.push(Object.freeze({ id: id.toString(), classification: "TRANSIENT", code: "RECORD_RPC_UNAVAILABLE" })); continue; }
+    if (raw[0] !== raw[1]) { issues.push(Object.freeze({ id: id.toString(), classification: "UNRESOLVED", code: "RECORD_PROVIDER_DISAGREEMENT" })); continue; }
+    try {
+      const decoded = decodeFunctionResult({ abi: ABI, functionName: "commitments", data: raw[0] });
+      if (decoded[0] !== id || decoded[4] <= 0n || decoded[6] <= decoded[5]) throw new Error("invalid record");
+      const creator = getAddress(decoded[1]); const subject = getAddress(decoded[2]); const token = getAddress(decoded[3]);
+      if ([creator, subject, token].some((value) => value.toLowerCase() === ZERO_ADDRESS)) throw new Error("zero address");
+      commitments.push(Object.freeze({ id: id.toString(), creator, subject, token, minimumBalanceBaseUnits: decoded[4].toString(), startBlock: decoded[5].toString(), endBlock: decoded[6].toString() }));
+    } catch { issues.push(Object.freeze({ id: id.toString(), classification: "UNRESOLVED", code: "RECORD_MALFORMED" })); }
   }
-  return Object.freeze({ chainId: Number(COMPETITION_CHAIN_ID), head: BigInt(tag), upperBound: next - 1n, commitments: Object.freeze(commitments) });
+  return Object.freeze({ chainId: Number(COMPETITION_CHAIN_ID), head: BigInt(tag), upperBound: next - 1n, commitments: Object.freeze(commitments), issues: Object.freeze(issues) });
 }
 
 export function selectCompletedVerificationJobs(input: { snapshot: RegistrySnapshot; index: PublicResultIndex; limit: number; manualCommitmentId?: string }): readonly RegistryCommitment[] {
   if (!Number.isSafeInteger(input.limit) || input.limit < 1 || input.limit > 25) throw new Error("Verification limit must be between 1 and 25.");
-  const eligible = (item: RegistryCommitment) => BigInt(item.endBlock) < input.snapshot.head
-    && item.token.toLowerCase() === STEST_ADDRESS.toLowerCase()
-    && !input.index.results[item.id];
+  const eligible = (item: RegistryCommitment) => BigInt(item.endBlock) < input.snapshot.head && item.token.toLowerCase() === STEST_ADDRESS.toLowerCase() && !input.index.results[item.id];
   if (input.manualCommitmentId !== undefined && input.manualCommitmentId !== "") {
     if (!/^[1-9][0-9]*$/.test(input.manualCommitmentId)) throw new Error("Manual commitment ID must be a canonical positive integer.");
     const selected = input.snapshot.commitments.find((item) => item.id === input.manualCommitmentId);
@@ -53,8 +62,5 @@ export function selectCompletedVerificationJobs(input: { snapshot: RegistrySnaps
     if (BigInt(selected.endBlock) >= input.snapshot.head) throw new Error(`Manual commitment #${selected.id} has not ended at the finalized head.`);
     return Object.freeze([selected]);
   }
-  return Object.freeze(input.snapshot.commitments
-    .filter(eligible)
-    .sort((a, b) => BigInt(a.id) < BigInt(b.id) ? -1 : 1)
-    .slice(0, input.limit));
+  return Object.freeze(input.snapshot.commitments.filter(eligible).sort((a, b) => BigInt(a.id) < BigInt(b.id) ? -1 : BigInt(a.id) > BigInt(b.id) ? 1 : 0).slice(0, input.limit));
 }

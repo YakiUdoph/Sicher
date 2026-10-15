@@ -79,7 +79,7 @@ test("14 scheduled runs cannot inject a manual target", () => {
 
 test("15 manual targeting does not bypass the single worker verification and publication pipeline", () => {
   const worker = readFileSync(resolve(ROOT, "scripts/phase10b-worker.ts"), "utf8");
-  assert.match(worker, /selectCompletedVerificationJobs\([\s\S]*manualCommitmentId/);
+  assert.match(worker, /selectFairCandidate\([\s\S]*manualCommitmentId/);
   assert.equal((worker.match(/verifyOneCommitment\(/g) ?? []).length, 1);
   assert.equal((worker.match(/publishValidatedResult\(/g) ?? []).length, 1);
 });

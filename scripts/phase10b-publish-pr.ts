@@ -16,7 +16,7 @@ async function loadStore(commitSha: string): Promise<StoreSnapshot> {
   const tree = await request(`/git/trees/${encodeURIComponent(commitSha)}?recursive=1`) as { truncated?: boolean; tree: Array<{ path: string; type: string; sha: string }> };
   if (tree.truncated) throw new Error("GitHub returned a truncated result-store tree.");
   if (tree.tree.some((item) => item.path.startsWith("receipts/") && item.type !== "blob" && item.type !== "tree")) throw new Error("Result store contains an unsupported Git object.");
-  const publicationBlobs = tree.tree.filter((item) => item.type === "blob" && (item.path === "index.json" || item.path.startsWith("receipts/")));
+  const publicationBlobs = tree.tree.filter((item) => item.type === "blob" && (item.path === "index.json" || item.path === "scheduler.json" || item.path.startsWith("receipts/")));
   const files = new Map<string, string>();
   for (const item of publicationBlobs) { const blob = await request(`/git/blobs/${item.sha}`) as { content: string; encoding: string }; if (blob.encoding !== "base64") throw new Error("Unexpected GitHub blob encoding."); files.set(item.path, Buffer.from(blob.content.replace(/\s/g, ""), "base64").toString("utf8")); }
   const indexText = files.get("index.json"); if (!indexText) throw new Error("Result index is missing from Git commit.");
@@ -32,4 +32,4 @@ const api: GitHubPublicationApi = {
   async deleteBranch(branch) { await request(`/git/refs/heads/${encodeURIComponent(branch)}`, { method: "DELETE" }, [404]); },
 };
 const result = await publishThroughProtectedPullRequest({ api, temporaryBranch, expectedTargetSha, expectedHeadSha });
-console.log(`pull=${result.pullNumber} commitment=${result.newId} merge=${result.mergeSha}`);
+console.log(`pull=${result.pullNumber} transition=${result.newId ? `commitment-${result.newId}` : "scheduler-only"} merge=${result.mergeSha}`);
