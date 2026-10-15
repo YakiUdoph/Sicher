@@ -29,6 +29,7 @@ The accepted boundary does not eliminate a correlated omission shared by all con
 - Receipt V3 schema, digest, evidence-manifest digest, and frozen implementation fingerprints are validated.
 - The browser does not recompute proof verdicts from displayed balances.
 - Public records #1 and #2 are bound to validated frozen artifacts.
+- Registry-only Explore records cannot acquire a terminal result or assurance label without matching validated public receipt data.
 
 These properties are scoped to the documented network, contracts, software, configuration, and token model.
 
@@ -47,6 +48,8 @@ On load, an available wallet is queried passively with `eth_accounts` and `eth_c
 Network switching is user-triggered through `wallet_switchEthereumChain`, with `wallet_addEthereumChain` used only when the wallet reports that Elysium is missing.
 
 The `/start` page reads `eth_blockNumber` from the public configured RPC without wallet authorization. It refreshes while the form is open.
+
+Explore uses the same approved public RPC configuration for read-only `eth_chainId`, `eth_blockNumber`, and registry `eth_call` requests. It does not request wallet accounts, connect a wallet, sign, or send a transaction. `nextCommitmentId` is snapshotted once per discovery operation and commitment reads use bounded concurrency. Any malformed or partial discovery fails visibly rather than being presented as an empty registry.
 
 ## Transaction construction
 

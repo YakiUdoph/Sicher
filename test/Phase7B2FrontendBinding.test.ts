@@ -16,7 +16,7 @@ const getter = async (id: string): Promise<VerifiedCommitmentView> => {
   return item;
 };
 
-test("1 Explore shows exactly two real commitments", async () => {
+test("1 published receipt adapter exposes exactly two validated commitments", async () => {
   const state = await loadExploreState(getter);
   assert.equal(state.kind, "success");
   if (state.kind === "success") assert.deepEqual(state.commitments.map(({ id }) => id), ["1", "2"]);

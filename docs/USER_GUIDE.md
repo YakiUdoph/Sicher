@@ -14,11 +14,11 @@ The current product runs on Elysium Testnet and supports one proof type: keeping
 
 1. Open <https://sicherd.vercel.app/explore>.
 2. Choose Commitment #1 or Commitment #2.
-3. Review the promised minimum, lowest observed balance, result, and assurance label.
-4. Open the proof for the historical path and explanation.
-5. Open the receipt for the human summary and optional technical details.
+3. Review the promised minimum and current lifecycle state.
+4. For a validated result, open the proof for the historical path and explanation.
+5. Open its receipt for the human summary and optional technical details.
 
-The public product currently contains only commitments #1 and #2.
+Explore reads genuine commitments directly from the canonical registry. A record may be Scheduled, Proof running, or Awaiting result without having a terminal verdict. Commitments #1 and #2 currently have validated published results; other visible commitments do not gain a verdict merely by existing.
 
 ## Understanding the result
 
@@ -45,6 +45,8 @@ From a proof page, choose **Open receipt**. The receipt shows:
 - the historical balance path.
 
 Technical details expose the chain, addresses, block range, evidence transaction, hashes, providers, receipt digest, and implementation fingerprints. The receipt is an off-chain record, not an on-chain object.
+
+If no validated receipt has been published, the receipt route says so and returns to the commitment. It does not create a balance path, result, or assurance label.
 
 ## What STEST means
 

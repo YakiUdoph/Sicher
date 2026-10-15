@@ -33,6 +33,7 @@ flowchart LR
 
   UI -->|explicit connect and reviewed transaction| Wallet
   Wallet -->|createCommitment| Registry
+  Registry -->|read-only discovery and immutable terms| UI
   Registry -->|terms and CommitmentCreated| Acquire
   Token -->|balanceOf and Transfer evidence| Acquire
   Run --> Acquire
@@ -65,6 +66,7 @@ STEST provides the conventional ERC-20 `Transfer` history used by the frozen evi
 ### Off-chain automated code
 
 - Browser-side validation and transaction construction.
+- Read-only registry discovery using a single `nextCommitmentId` snapshot and bounded commitment reads.
 - Provider RPC acquisition and deterministic range coverage.
 - Evidence normalization, deduplication, and ordering.
 - Balance reconstruction in integer base units.
@@ -131,6 +133,12 @@ The ordering is required because multiple balance-changing transfers can occur w
 6. The browser loads and renders the prepared record; it does not recompute or upgrade the verdict.
 
 Receipt files are editable local/public files. Their digest is tamper-evident when compared with an expected value, but the receipt is not signed or anchored on-chain.
+
+## Dynamic Explore lifecycle
+
+Explore obtains existence and immutable terms from the canonical registry. During one load it verifies the chain, reads the head, snapshots `nextCommitmentId` once, and reads the resulting finite ID range with bounded concurrency. A malformed or partial registry read fails the complete live view rather than appearing as zero commitments.
+
+The prepared public receipt dataset is a separate enrichment source. A terminal result is used only when its ID, creator, subject, token, minimum, and block range agree with the registry record. Without a matching published receipt, the head determines only `Scheduled`, `Proof running`, or `Awaiting result`; it never determines `PROVEN`, `NOT_PROVEN`, or `CORROBORATED`.
 
 ## Fail-closed behavior
 

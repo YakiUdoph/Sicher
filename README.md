@@ -34,7 +34,7 @@ The final balance recovered to 100,000 STEST, but the interval included a 15,000
 
 Commitment #1 is the positive control: it promised at least 80,000 STEST, its minimum observed balance was 92,000 STEST, and its result is **PROVEN / CORROBORATED**.
 
-The frozen receipt evidence is in [`evidence/`](evidence/), and the public presentation data contains only commitments #1 and #2.
+The frozen receipt evidence is in [`evidence/`](evidence/). Explore discovers every genuine commitment from the canonical registry; the validated public receipt dataset currently supplies terminal results only for commitments #1 and #2.
 
 ## Live product
 
@@ -73,7 +73,8 @@ Verdicts and Receipt V3 files are not stored on-chain.
 - Exact balance reconstruction and repeatable verdict computation.
 - Targeted transaction-receipt checks.
 - Receipt V3 generation and validation.
-- Preparation of the public #1/#2 records and their publication in the frontend.
+- Preparation and publication of validated terminal records, currently #1 and #2.
+- Read-only browser discovery of immutable registry commitments and their current lifecycle timing.
 
 After the interval ends, a Sicher operator currently runs verification and publishes the validated result.
 
@@ -95,7 +96,9 @@ STEST means **Sicher Test Token**. It is not `$SICHER`, and Sicher assigns it no
 | #1 | 80,000 STEST | 92,000 STEST | 92,000 STEST | `PROVEN` | `CORROBORATED` |
 | #2 | 80,000 STEST | 15,000 STEST | 100,000 STEST | `NOT_PROVEN` | `CORROBORATED` |
 
-Commitments #6 and #7 appear only in technical lifecycle evidence. They are not public showcased product records. Records #3-#7 are not exposed by the product's prepared public dataset.
+Explore also shows registry-only commitments without inventing results. Commitments #3-#10 currently have no validated result in the published frontend dataset, so they appear as **Awaiting result**. The local #6/#7 receipts remain technical lifecycle evidence and do not cross the public publication boundary in this release.
+
+Registry existence and verification are different. Appearing in Explore confirms that a commitment and its immutable terms exist on-chain. `PROVEN`, `NOT_PROVEN`, and `CORROBORATED` appear only when the published validated receipt agrees with those registry terms.
 
 ## Assurance
 
@@ -165,7 +168,7 @@ The verifier and frontend fail closed on missing or inconsistent required eviden
 
 ## Status
 
-Sicher currently runs on Elysium Testnet. Its public records show the complete proof story for commitments #1 and #2, with documented trust boundaries and limitations. It is not production-ready.
+Sicher currently runs on Elysium Testnet. Explore reads genuine commitments from the canonical registry, while the complete validated proof stories for commitments #1 and #2 remain separately receipt-backed. It is not production-ready.
 
 ## Documentation
 
