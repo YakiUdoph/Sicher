@@ -65,6 +65,7 @@
     "phase7d4:reconcile-7-readonly": "node scripts/phase7d4-readonly-reconcile.ts",
     "phase10b:test": "node --test test/Phase10BAutomaticLifecycle.test.ts",
     "phase10b1:test": "node --test test/Phase10B1ProtectedPRPublication.test.ts",
+    "phase10b2:test": "node --test test/Phase10B2ActivationRemediation.test.ts",
     "phase10b:bootstrap-results": "node scripts/phase10b-bootstrap-results.ts",
     "typecheck": "tsc --noEmit"
   },

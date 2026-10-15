@@ -39,12 +39,22 @@ export async function scanFinalizedRegistry(providerUrls: readonly [string, stri
   return Object.freeze({ chainId: Number(COMPETITION_CHAIN_ID), head: BigInt(tag), upperBound: next - 1n, commitments: Object.freeze(commitments) });
 }
 
-export function selectCompletedVerificationJobs(input: { snapshot: RegistrySnapshot; index: PublicResultIndex; limit: number }): readonly RegistryCommitment[] {
+export function selectCompletedVerificationJobs(input: { snapshot: RegistrySnapshot; index: PublicResultIndex; limit: number; manualCommitmentId?: string }): readonly RegistryCommitment[] {
   if (!Number.isSafeInteger(input.limit) || input.limit < 1 || input.limit > 25) throw new Error("Verification limit must be between 1 and 25.");
+  const eligible = (item: RegistryCommitment) => BigInt(item.endBlock) < input.snapshot.head
+    && item.token.toLowerCase() === STEST_ADDRESS.toLowerCase()
+    && !input.index.results[item.id];
+  if (input.manualCommitmentId !== undefined && input.manualCommitmentId !== "") {
+    if (!/^[1-9][0-9]*$/.test(input.manualCommitmentId)) throw new Error("Manual commitment ID must be a canonical positive integer.");
+    const selected = input.snapshot.commitments.find((item) => item.id === input.manualCommitmentId);
+    if (!selected) throw new Error(`Manual commitment #${input.manualCommitmentId} does not exist in the finalized registry snapshot.`);
+    if (input.index.results[selected.id]) throw new Error(`Manual commitment #${selected.id} is already published.`);
+    if (selected.token.toLowerCase() !== STEST_ADDRESS.toLowerCase()) throw new Error(`Manual commitment #${selected.id} uses an unsupported token.`);
+    if (BigInt(selected.endBlock) >= input.snapshot.head) throw new Error(`Manual commitment #${selected.id} has not ended at the finalized head.`);
+    return Object.freeze([selected]);
+  }
   return Object.freeze(input.snapshot.commitments
-    .filter((item) => BigInt(item.endBlock) < input.snapshot.head)
-    .filter((item) => item.token.toLowerCase() === STEST_ADDRESS.toLowerCase())
-    .filter((item) => !input.index.results[item.id])
+    .filter(eligible)
     .sort((a, b) => BigInt(a.id) < BigInt(b.id) ? -1 : 1)
     .slice(0, input.limit));
 }

@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "17 */6 * * *"
   workflow_dispatch:
+    inputs:
+      commitment_id:
+        description: "Optional single commitment ID for a controlled verification run"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -15,6 +20,7 @@ concurrency:
 
 jobs:
   publish:
+    environment: sicher-result-publication
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -50,6 +56,7 @@ jobs:
           PHASE10B_RESULTS_BRANCH_PROTECTED: ${{ vars.SICHER_RESULTS_BRANCH_PROTECTED }}
           PHASE10B_RESULTS_ROOT: .phase10b-results
           PHASE10B_MAX_RESULTS: "1"
+          PHASE10B_MANUAL_COMMITMENT_ID: ${{ github.event_name == 'workflow_dispatch' && inputs.commitment_id || '' }}
           PHASE6_CHAIN_ID: "99801"
           PHASE6_REGISTRY_ADDRESS: "0x4e4887E28a8370678A9a37C08A85c65450b510c0"
           PHASE6_RPC_A_NAME: hypedexer
