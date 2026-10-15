@@ -1,0 +1,90 @@
+name: Publish terminal results
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sicher-terminal-result-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check publication authorization
+        env:
+          BRANCH_PROTECTED: ${{ vars.SICHER_RESULTS_BRANCH_PROTECTED }}
+        run: test "$BRANCH_PROTECTED" = "true"
+      - name: Check out audited worker
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Check out append-only results branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: sicher-results
+          path: .phase10b-results
+          fetch-depth: 0
+      - name: Snapshot authoritative result store
+        run: |
+          mkdir .phase10b-baseline
+          cp .phase10b-results/index.json .phase10b-baseline/index.json
+          cp -R .phase10b-results/receipts .phase10b-baseline/receipts
+          echo "PHASE10B_EXPECTED_TARGET_SHA=$(git -C .phase10b-results rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24.10.0
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Scan, verify, and stage bounded results
+        env:
+          PHASE10B_RESULTS_BRANCH_PROTECTED: ${{ vars.SICHER_RESULTS_BRANCH_PROTECTED }}
+          PHASE10B_RESULTS_ROOT: .phase10b-results
+          PHASE10B_MAX_RESULTS: "1"
+          PHASE6_CHAIN_ID: "99801"
+          PHASE6_REGISTRY_ADDRESS: "0x4e4887E28a8370678A9a37C08A85c65450b510c0"
+          PHASE6_RPC_A_NAME: hypedexer
+          PHASE6_RPC_A_URL: https://elysium-testnet-rpc.hypedexer.com
+          PHASE6_RPC_B_NAME: conduit
+          PHASE6_RPC_B_URL: https://rpc-elysium-testnet.t.conduit.xyz
+          PHASE6_ASSURANCE_MODE: CORROBORATED
+        run: node scripts/phase10b-worker.ts
+      - name: Detect publication change
+        id: publication_change
+        run: |
+          if [ -z "$(git -C .phase10b-results status --porcelain -- index.json receipts)" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Validate publication transition
+        if: steps.publication_change.outputs.changed == 'true'
+        env:
+          PHASE10B_BASELINE_ROOT: .phase10b-baseline
+          PHASE10B_RESULTS_ROOT: .phase10b-results
+        run: node scripts/phase10b-pr-preflight.ts
+      - name: Commit and push temporary publication branch
+        if: steps.publication_change.outputs.changed == 'true'
+        id: publication_commit
+        working-directory: .phase10b-results
+        run: |
+          PUBLICATION_BRANCH="sicher-results-publish-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git switch -c "$PUBLICATION_BRANCH"
+          git config user.name "sicher-result-publisher"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -- index.json receipts
+          git diff --cached --check
+          git commit -m "chore(results): publish verified terminal result"
+          git push --set-upstream origin "$PUBLICATION_BRANCH"
+          echo "PHASE10B_TEMPORARY_BRANCH=$PUBLICATION_BRANCH" >> "$GITHUB_ENV"
+          echo "PHASE10B_EXPECTED_HEAD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Open, revalidate, and squash-merge publication PR
+        if: steps.publication_change.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/phase10b-publish-pr.ts

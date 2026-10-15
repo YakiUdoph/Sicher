@@ -10,5 +10,6 @@ coverage/
 Thumbs.db
 .idea/
 .vscode/
+.phase10b-results/
 *.swp
 *.swo

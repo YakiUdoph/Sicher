@@ -14,12 +14,13 @@ import {
   type RegistryCommitment,
   type RegistrySnapshot,
 } from "./registryDiscovery.ts";
+import { loadRuntimeResults } from "./runtimeResults.ts";
 
 export type DynamicCommitmentPresentation = Readonly<{
   id: string;
   title: string;
   initials: string;
-  status: "proven" | "not-proven" | "pending" | "indeterminate" | "scheduled" | "running" | "awaiting-result";
+  status: "proven" | "not-proven" | "pending" | "indeterminate" | "scheduled" | "running" | "awaiting-result" | "checking-result" | "check-delayed";
   statusLabel: string;
   assuranceLabel: string | null;
   summary: string;
@@ -50,7 +51,7 @@ export type DynamicCommitmentPresentation = Readonly<{
   providers: readonly string[];
   recoveryNote: string | null;
   hasValidatedReceipt: boolean;
-  lifecycle: "scheduled" | "running" | "awaiting-result" | "validated";
+  lifecycle: "scheduled" | "running" | "awaiting-result" | "checking-result" | "check-delayed" | "validated";
 }>;
 
 export type DynamicExploreState =
@@ -65,10 +66,13 @@ export type DynamicProjectState =
 
 type LoaderOptions = Readonly<{
   discover?: () => Promise<RegistrySnapshot>;
-  loadPublished?: () => Promise<VerifiedCommitmentsDocument>;
+  loadPublished?: () => Promise<VerifiedCommitmentsDocument | PublishedCommitments>;
 }>;
 
-export async function loadPublishedCommitments(fetchImpl: typeof fetch = fetch): Promise<VerifiedCommitmentsDocument> {
+type PublicationState = "unconfigured" | "operational" | "delayed";
+type PublishedCommitments = Readonly<{ document: VerifiedCommitmentsDocument; publicationState: PublicationState }>;
+
+export async function loadPublishedCommitments(fetchImpl: typeof fetch = fetch): Promise<PublishedCommitments> {
   let response: Response;
   try {
     response = await fetchImpl("/data/commitments.json", { cache: "no-store" });
@@ -77,7 +81,16 @@ export async function loadPublishedCommitments(fetchImpl: typeof fetch = fetch):
   }
   if (!response.ok) throw new VerifiedCommitmentDataError("UNAVAILABLE", "Published receipt data is unavailable.");
   try {
-    return validateVerifiedCommitmentsDocument(await response.json());
+    const prepared = validateVerifiedCommitmentsDocument(await response.json());
+    const configuredBase = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env?.VITE_SICHER_RESULTS_BASE_URL;
+    const runtime = await loadRuntimeResults({ baseUrl: configuredBase, fetchImpl });
+    const merged = { ...prepared.commitments };
+    for (const [id, receipt] of Object.entries(runtime.commitments.commitments)) {
+      const existing = merged[id];
+      if (existing && existing.receiptDigest !== receipt.receiptDigest) throw new VerifiedCommitmentDataError("MALFORMED", `Conflicting published receipt for commitment #${id}.`);
+      merged[id] = receipt;
+    }
+    return Object.freeze({ document: validateVerifiedCommitmentsDocument({ schemaVersion: prepared.schemaVersion, commitments: merged }), publicationState: runtime.state });
   } catch (error) {
     if (error instanceof VerifiedCommitmentDataError) throw error;
     throw new VerifiedCommitmentDataError("MALFORMED", "Published receipt data is malformed.");
@@ -120,6 +133,7 @@ export function presentRegistryCommitment(
   record: RegistryCommitment,
   head: bigint,
   receipt?: VerifiedCommitmentView,
+  publicationState: PublicationState = "unconfigured",
 ): DynamicCommitmentPresentation {
   if (receipt) {
     if (!termsAgree(record, receipt)) {
@@ -127,20 +141,23 @@ export function presentRegistryCommitment(
     }
     return Object.freeze({ ...toCommitmentPresentation(receipt), hasValidatedReceipt: true, lifecycle: "validated" });
   }
-  const lifecycle = lifecycleFor(record, head);
+  const baseLifecycle = lifecycleFor(record, head);
+  const lifecycle = baseLifecycle === "awaiting-result" && publicationState === "operational" ? "checking-result" : baseLifecycle === "awaiting-result" && publicationState === "delayed" ? "check-delayed" : baseLifecycle;
   const minimumRequired = formattedMinimum(record);
   return Object.freeze({
     id: record.id,
     title: `Commitment #${record.id}`,
     initials: `#${record.id}`,
     status: lifecycle,
-    statusLabel: lifecycleLabel(lifecycle),
+    statusLabel: lifecycle === "checking-result" ? "Checking result" : lifecycle === "check-delayed" ? "Result check delayed" : lifecycleLabel(lifecycle),
     assuranceLabel: null,
     summary: lifecycle === "scheduled"
       ? "The commitment period has not started."
       : lifecycle === "running"
         ? "The commitment period is currently in progress."
-        : "The interval has ended; no validated result has been published yet.",
+        : lifecycle === "checking-result" ? "The interval has ended and the publication worker is checking for a validated result."
+          : lifecycle === "check-delayed" ? "The result publication service is unavailable; no terminal result is shown."
+            : "The interval has ended; no validated result has been published yet.",
     plainProofType: `Keep at least ${minimumRequired}`,
     technicalProofType: "MIN_BALANCE",
     tokenName: record.token.toLowerCase() === STEST_ADDRESS.toLowerCase() ? "Sicher Test Token" : "Recorded token",
@@ -177,26 +194,28 @@ export function matchesCommitmentSearch(item: DynamicCommitmentPresentation, que
   return `${item.id} ${item.title} ${item.tokenSymbol} ${item.statusLabel}`.toLowerCase().includes(normalized);
 }
 
-function merge(snapshot: RegistrySnapshot, published: VerifiedCommitmentsDocument): readonly DynamicCommitmentPresentation[] {
+function merge(snapshot: RegistrySnapshot, published: VerifiedCommitmentsDocument, publicationState: PublicationState): readonly DynamicCommitmentPresentation[] {
   const records = new Map(snapshot.commitments.map((record) => [record.id, record]));
   for (const id of Object.keys(published.commitments)) {
     if (!records.has(id)) throw new VerifiedCommitmentDataError("MALFORMED", `Published receipt #${id} has no matching registry record.`);
   }
-  return Object.freeze(snapshot.commitments.map((record) => presentRegistryCommitment(record, snapshot.head, published.commitments[record.id])));
+  return Object.freeze(snapshot.commitments.map((record) => presentRegistryCommitment(record, snapshot.head, published.commitments[record.id], publicationState)));
 }
 
 export async function loadDynamicExploreState(options: LoaderOptions = {}): Promise<DynamicExploreState> {
   const discover = options.discover ?? discoverRegistryCommitments;
   const loadPublished = options.loadPublished ?? loadPublishedCommitments;
   let published: VerifiedCommitmentsDocument;
+  let publicationState: PublicationState = "unconfigured";
   try {
-    published = await loadPublished();
+    const loaded = await loadPublished();
+    if ("document" in loaded) { published = loaded.document; publicationState = loaded.publicationState; } else published = loaded;
   } catch {
     return Object.freeze({ kind: "error", reason: "validation_error", fallback: Object.freeze([]) });
   }
   try {
     const snapshot = await discover();
-    const commitments = merge(snapshot, published);
+    const commitments = merge(snapshot, published, publicationState);
     return Object.freeze({
       kind: "success", commitments,
       onChainCount: commitments.length,

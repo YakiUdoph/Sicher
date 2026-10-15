@@ -63,6 +63,9 @@
     "phase7d4:test-transaction-safety": "node --test test/Phase7D4TransactionSafety.test.ts",
     "phase8c:test-release-boundary": "node --test test/Phase8CReleaseBoundary.test.ts",
     "phase7d4:reconcile-7-readonly": "node scripts/phase7d4-readonly-reconcile.ts",
+    "phase10b:test": "node --test test/Phase10BAutomaticLifecycle.test.ts",
+    "phase10b1:test": "node --test test/Phase10B1ProtectedPRPublication.test.ts",
+    "phase10b:bootstrap-results": "node scripts/phase10b-bootstrap-results.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -1,0 +1,49 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import test from "node:test";
+
+import { validateVerifiedCommitmentsDocument } from "../frontend/src/verifiedCommitments.ts";
+import { validateVerifierResult, type PublicResultDocument, type PublicResultEntry, type PublicResultIndex } from "../scripts/phase10b-publication.ts";
+import { publishThroughProtectedPullRequest, validatePublicationTransition, validatePullRequestState, validateStoreSnapshot, type GitHubPublicationApi, type StoreSnapshot } from "../scripts/phase10b-pr-publication.ts";
+
+const ROOT = resolve(import.meta.dirname, "..");
+const prepared = validateVerifiedCommitmentsDocument(JSON.parse(readFileSync(resolve(ROOT, "frontend/public/data/commitments.json"), "utf8")));
+function document(id: "1" | "2"): PublicResultDocument { const view = prepared.commitments[id]; const envelope = JSON.parse(readFileSync(resolve(ROOT, `evidence/phase6b2-commitment${id}-receipt-v3.json`), "utf8")); return validateVerifierResult({ envelope, pathBaseUnits: view.pathBaseUnits, terms: { id, creator: view.creator, subject: view.subject, token: view.token, minimumBalanceBaseUnits: view.minimumRequiredBaseUnits, startBlock: view.startBlock, endBlock: view.endBlock } }).document; }
+const documents = { "1": document("1"), "2": document("2") };
+function store(ids: Array<"1" | "2">, operational = false): StoreSnapshot {
+  const results: Record<string, PublicResultEntry> = {}; const files = new Map<string, string>();
+  for (const id of ids) { const receipt = documents[id].envelope.receipt; const receiptPath = `receipts/99801/0x4e4887e28a8370678a9a37c08a85c65450b510c0/${id}/${receipt.receiptDigest}.json`; results[id] = { chainId: "99801", registryAddress: receipt.registryAddress, commitmentId: id, receiptDigest: receipt.receiptDigest, documentDigest: documents[id].documentDigest, receiptPath, proofResult: receipt.proofResult as "PROVEN" | "NOT_PROVEN", assuranceLevel: receipt.assuranceLevel, verifierFingerprint: receipt.verifierFingerprint, publishedAt: "2026-01-01T00:00:00.000Z" }; files.set(receiptPath, `${JSON.stringify(documents[id], null, 2)}\n`); }
+  const index: PublicResultIndex = { schemaVersion: "sicher.public-result-index/1.0", chainId: "99801", registryAddress: documents["1"].envelope.receipt.registryAddress, automation: { operational }, results };
+  files.set("index.json", `${JSON.stringify(index, null, 2)}\n`); return validateStoreSnapshot(index, files);
+}
+const empty = store([]); const one = store(["1"]); const both = store(["1", "2"]);
+function pull(overrides: Partial<{ target: string; head: string; files: string[] }> = {}) { return { expectedTargetSha: "base", currentTargetSha: overrides.target ?? "base", expectedHeadSha: "head", pull: { number: 7, baseSha: overrides.target ?? "base", headSha: overrides.head ?? "head", changedFiles: overrides.files ?? ["index.json", one.index.results["1"].receiptPath] }, before: empty, after: one }; }
+
+test("1 active workflow contains no direct push to sicher-results", () => { const source = readFileSync(resolve(ROOT, ".github/workflows/phase10b-publish-results.yml"), "utf8"); assert.doesNotMatch(source, /git push[^\n]*sicher-results(?:\s|$)/); assert.match(source, /git push --set-upstream origin "\$PUBLICATION_BRANCH"/); });
+test("2 malicious extra PR file is rejected", () => { const files = new Map(one.files); files.set("evil.json", "{}"); assert.throws(() => validateStoreSnapshot(one.index, files), /unexpected/); });
+test("3 modified existing #1 is rejected", () => { const changed = store(["1"]); const index = structuredClone(changed.index) as any; index.results["1"].publishedAt = "2026-02-01T00:00:00Z"; const files = new Map(changed.files); files.set("index.json", JSON.stringify(index)); const after = validateStoreSnapshot(index, files); assert.throws(() => validatePublicationTransition(one, after), /modified/); });
+test("4 modified existing #2 is rejected", () => { const before = both; const index = structuredClone(before.index) as any; index.results["2"].publishedAt = "2026-02-01T00:00:00Z"; const files = new Map(before.files); files.set("index.json", JSON.stringify(index)); assert.throws(() => validatePublicationTransition(before, validateStoreSnapshot(index, files)), /#2/); });
+test("5 deleted existing result is rejected", () => assert.throws(() => validatePublicationTransition(both, one), /deleted/));
+test("6 conflicting digest is rejected", () => { const index = structuredClone(one.index) as any; index.results["1"].receiptDigest = "0".repeat(64); const files = new Map(one.files); files.set("index.json", JSON.stringify(index)); assert.throws(() => validateStoreSnapshot(index, files)); });
+test("7 stale target SHA is rejected", () => assert.throws(() => validatePullRequestState(pull({ target: "stale" })), /Target/));
+test("8 changed PR head SHA is rejected", () => assert.throws(() => validatePullRequestState(pull({ head: "changed" })), /head/));
+test("9 more than one new terminal result is rejected", () => assert.throws(() => validatePublicationTransition(empty, both), /at most one/));
+test("10 malformed Receipt V3 is rejected", () => { const doc = structuredClone(documents["1"]) as any; doc.envelope.receipt.proofResult = "FAKE"; const files = new Map(one.files); files.set(one.index.results["1"].receiptPath, JSON.stringify(doc)); assert.throws(() => validateStoreSnapshot(one.index, files)); });
+test("11 broken document digest is rejected", () => { const doc = structuredClone(documents["1"]) as any; doc.documentDigest = "0".repeat(64); const files = new Map(one.files); files.set(one.index.results["1"].receiptPath, JSON.stringify(doc)); assert.throws(() => validateStoreSnapshot(one.index, files), /digest/); });
+test("12 broken receipt digest is rejected", () => { const doc = structuredClone(documents["1"]) as any; doc.envelope.receipt.receiptDigest = "0".repeat(64); const files = new Map(one.files); files.set(one.index.results["1"].receiptPath, JSON.stringify(doc)); assert.throws(() => validateStoreSnapshot(one.index, files)); });
+test("13 unexpected activation change is rejected", () => assert.throws(() => validatePublicationTransition(store([], false), store([], true)), /activation/));
+test("14 concurrency is serialized and stale target loses", () => { const workflow = readFileSync(resolve(ROOT, ".github/workflows/phase10b-publish-results.yml"), "utf8"); assert.match(workflow, /concurrency:[\s\S]*cancel-in-progress: false/); assert.throws(() => validatePullRequestState(pull({ target: "other-run" })), /Target/); });
+test("15 failed PR is closed and temporary branch is deleted", async () => { let closed = false; let deleted = false; const api = mockApi({ merge: false, closed: () => { closed = true; }, deleted: () => { deleted = true; } }); await assert.rejects(publishThroughProtectedPullRequest({ api, temporaryBranch: "sicher-results-publish-1", expectedTargetSha: "base", expectedHeadSha: "head" })); assert.equal(closed, true); assert.equal(deleted, true); });
+test("16 successful merge deletes temporary branch", async () => { let deleted = false; const api = mockApi({ deleted: () => { deleted = true; } }); const result = await publishThroughProtectedPullRequest({ api, temporaryBranch: "sicher-results-publish-1", expectedTargetSha: "base", expectedHeadSha: "head" }); assert.equal(result.newId, "1"); assert.equal(deleted, true); });
+test("17 #6 and #7 technical fixtures are never imported by PR publication", () => { const text = JSON.stringify([...both.files.keys()]); assert.doesNotMatch(text, /\/(6|7)\//); });
+test("18 #10 is neither verified nor published during implementation", () => { const workflow = readFileSync(resolve(ROOT, ".github/workflows/phase10b-publish-results.yml"), "utf8"); assert.doesNotMatch(workflow, /PHASE6_COMMITMENT_ID:\s*["']?10(?:\s|$)/i); assert.match(workflow, /SICHER_RESULTS_BRANCH_PROTECTED/); assert.equal(Object.hasOwn(both.index.results, "10"), false); });
+test("19 PR changed-file list must exactly match transition", () => assert.throws(() => validatePullRequestState(pull({ files: ["index.json", "README.md"] })), /changed-file/));
+test("20 target head is re-read before the PR is opened", async () => { let opened = false; const api = mockApi({ preOpenTarget: "stale", opened: () => { opened = true; } }); await assert.rejects(publishThroughProtectedPullRequest({ api, temporaryBranch: "sicher-results-publish-1", expectedTargetSha: "base", expectedHeadSha: "head" }), /before pull request/); assert.equal(opened, false); });
+test("21 temporary branch cleanup failure is reported", async () => { const api = mockApi({ deleteError: new Error("cleanup failed") }); await assert.rejects(publishThroughProtectedPullRequest({ api, temporaryBranch: "sicher-results-publish-1", expectedTargetSha: "base", expectedHeadSha: "head" }), /cleanup failed/); });
+
+function mockApi(hooks: { merge?: boolean; preOpenTarget?: string; opened?: () => void; closed?: () => void; deleted?: () => void; deleteError?: Error }): GitHubPublicationApi {
+  let merged = false;
+  let branchReads = 0;
+  return { getBranchHead: async () => { branchReads += 1; return merged ? "merge" : branchReads === 1 && hooks.preOpenTarget ? hooks.preOpenTarget : "base"; }, loadStore: async (sha) => sha === "base" ? empty : one, openPullRequest: async () => { hooks.opened?.(); return 7; }, getPullRequest: async () => ({ number: 7, baseSha: "base", headSha: "head", changedFiles: ["index.json", one.index.results["1"].receiptPath] }), mergePullRequest: async () => { if (hooks.merge === false) return { merged: false, sha: "" }; merged = true; return { merged: true, sha: "merge" }; }, closePullRequest: async () => { hooks.closed?.(); }, deleteBranch: async () => { if (hooks.deleteError) throw hooks.deleteError; hooks.deleted?.(); } };
+}
