@@ -3,7 +3,7 @@
   "chainId": "99801",
   "registryAddress": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
   "automation": {
-    "operational": false
+    "operational": true
   },
   "results": {
     "1": {
