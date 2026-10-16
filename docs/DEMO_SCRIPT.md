@@ -1,36 +1,37 @@
-# Sicher 90-Second Demo Script
+# Sicher 105–110 Second Product Demo
 
 ## Presenter safety
 
-Use the existing completed public records. Do not connect a wallet and do not bypass an active MetaMask or wallet-provider warning. Open the public pages directly in a wallet-free browser session.
+Use the existing public records. Do not submit a transaction, connect a wallet, or bypass an active MetaMask or wallet-provider warning. This is a product story, not a test-suite or GitHub Actions demonstration.
 
 ## Script
 
-| Time | Screen action | Voiceover | Expected visual |
-| --- | --- | --- | --- |
-| 0:00-0:10 | Open the Sicher homepage. | “A final wallet balance can hide what happened earlier. Sicher checks the interval, not just the snapshot.” | Homepage hero and “Proof, not promises.” |
-| 0:10-0:20 | Open **Explore proofs**. | “The terms are recorded before the outcome. These are real Elysium Testnet records, and the public product currently shows commitments one and two.” | Explore cards for #1 and #2. |
-| 0:20-0:35 | Open Commitment #2. Point to the promise. | “This project promised to keep at least eighty thousand STEST for the whole block interval.” | Commitment #2 with 80,000 STEST minimum. |
-| 0:35-0:55 | Trace the path from left to right. | “It started at one hundred thousand, moved to ninety-two thousand, dropped to fifteen thousand, then recovered to one hundred thousand.” | `100,000 -> 92,000 -> 15,000 -> 100,000 STEST`. |
-| 0:55-1:07 | Point to the result and assurance. | “Someone checking only the final balance might think the promise was kept. Sicher found the temporary breach. The verdict is Not proven. Recovery does not rewrite history.” | `NOT_PROVEN` and `CORROBORATED`, visually separate. |
-| 1:07-1:18 | Open Commitment #2's receipt. | “The receipt keeps the human explanation beside exact blocks, evidence, fingerprints, and the disclosed assurance limits.” | Receipt human summary; optionally expand technical details if already loaded. |
-| 1:18-1:26 | Navigate to Commitment #1. | “Commitment one is the positive control: an eighty-thousand minimum, a ninety-two-thousand observed minimum, and a Proven result.” | Commitment #1 showing `PROVEN / CORROBORATED`. |
-| 1:26-1:30 | Return focus to the result or logo. | “Proof, not promises. The record remembers.” | Sicher branding or proof summary. |
+| Time | Screen action | Voiceover |
+| --- | --- | --- |
+| 0:00–0:15 | Open the homepage. Hold on the hero. | “A project can restore funds after breaking a promise and look perfectly fine if you only check the final balance. A wallet can look healthy today and still have broken its promise yesterday.” |
+| 0:15–0:25 | Open Commitment #2. Point to the promise. | “This is a real Elysium Testnet commitment. The promise was simple: keep at least eighty thousand STEST in this wallet for the whole period.” |
+| 0:25–0:40 | Trace the historical path slowly. | “The wallet started at one hundred thousand, moved to ninety-two thousand, dropped to fifteen thousand, then returned to one hundred thousand.” |
+| 0:40–0:52 | Point to `NOT PROVEN`. | “The ending balance recovered, but the commitment was broken during the period. The result is Not proven.” |
+| 0:52–1:00 | Open the receipt and show the human summary. | “The money came back. The broken promise didn’t disappear. The receipt keeps that result beside the evidence and its limits.” |
+| 1:00–1:18 | Open Explore. Show validated and nonterminal statuses. | “Explore shows measurable commitments recorded on Elysium Testnet before their outcomes. Some have validated results. Others remain scheduled, running, checking, or delayed rather than receiving a guessed verdict.” |
+| 1:18–1:33 | Open **Make a commitment**. Do not connect or submit. | “A project starts here by recording the wallet, STEST minimum, and future period. The original terms are placed on Elysium before anyone knows the outcome.” |
+| 1:33–1:43 | Point to the field labels and public-record notice. | “After the period, Sicher checks the whole history—not only today’s balance—and publishes a result only when validation safely completes.” |
+| 1:43–1:50 | Return to the #2 result or logo. | “Sicher. Proof, not promises. The record remembers.” |
 
-## RPC or network fallback
+## Presenter notes
 
-The completed proof pages use the prepared public records and do not require a live wallet or transaction. Before presenting, open these routes in separate tabs:
+- `PROVEN`: the measurable commitment held throughout the evaluated period.
+- `NOT PROVEN`: the commitment was broken during the period.
+- `CORROBORATED`: checked across multiple sources; not mathematical certainty.
+- STEST is Sicher Test Token, not `$SICHER`, and has no claimed economic value.
+- Do not describe verdicts or receipts as on-chain. The commitment terms are on-chain; verification and receipts are off-chain.
 
-- <https://sicherd.vercel.app/explore>
+## Preload these pages
+
+- <https://sicherd.vercel.app/>
 - <https://sicherd.vercel.app/proof/2>
 - <https://sicherd.vercel.app/proof/2/receipt>
-- <https://sicherd.vercel.app/proof/1>
+- <https://sicherd.vercel.app/explore>
+- <https://sicherd.vercel.app/start>
 
-If a route is slow, move to the already loaded tab. Do not switch to `/start`, connect a wallet, or improvise a transaction. If production is unavailable, use a clean local build of the same release commit and clearly state that the fallback is local.
-
-## Claims boundary
-
-- Say “Sicher currently runs on Elysium Testnet,” not “production-ready.”
-- Say Commitment #2 is `NOT_PROVEN / CORROBORATED`, not exhaustively or trustlessly proven.
-- Do not say verdicts or receipts are on-chain.
-- Do not describe STEST as `$SICHER` or as an economic asset.
+If production is unavailable, use a clean local build of the same release and say that the fallback is local. Do not improvise a transaction.

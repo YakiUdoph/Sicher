@@ -4,6 +4,8 @@
 
 This document covers the current Elysium Testnet release. It describes reviewed properties and limitations; it is not a certification or a claim of universal security.
 
+In plain language, Sicher is designed to preserve the original commitment, detect a supported temporary balance breach, and refuse to invent success when required evidence is unsafe. It does not protect or custody the wallet, prevent funds from moving, or remove every dependency on software and infrastructure.
+
 ## Threat model
 
 The implementation considers:
@@ -121,7 +123,7 @@ Those observations do not establish that the classification is a false positive.
 - Future-start validation is in the frontend, not the deployed contract.
 - Duplicate protection is client-side, not a registry uniqueness rule.
 - Hashless send failures can remain ambiguous.
-- A Sicher operator runs verification and publication.
+- Verification and publication run through automatic off-browser infrastructure whose repository authorization gate and protected-branch policy remain operational trust dependencies.
 - Configured evidence sources have shared upstream dependencies.
 - Receipt digests are not signatures or on-chain anchors.
 - User-device, browser-extension, DNS, hosting-account, dependency, and provider compromise are not eliminated by these controls.

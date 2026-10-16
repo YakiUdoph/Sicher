@@ -12,7 +12,8 @@ const components = read("frontend/src/components.jsx");
 const css = read("frontend/src/styles.css");
 
 test("1 home uses the approved concise proposition", () => {
-  assert.match(main, /Make a measurable commitment\.<br \/>Sicher keeps the record\./);
+  assert.match(main, /A healthy balance<br \/><em>can hide a broken promise\.<\/em>/);
+  assert.match(main, /A wallet can look healthy today and still have broken its promise yesterday\. Sicher records the commitment first and checks the whole period\./);
   assert.doesNotMatch(main, /Projects say what they’ll do|The interesting part is what happens next|What was hidden/);
 });
 
@@ -20,7 +21,7 @@ test("2 the strongest historical example is shown without duplicate adjacent exp
   const home = main.slice(main.indexOf("function Home()"), main.indexOf("function Explore()"));
   assert.match(home, /Wallet balance during the commitment/);
   assert.match(home, /<ProofStrip proof=\{stripProof\(breach\)\}/);
-  assert.match(home, /The balance recovered\.<\/h3><p>The breach didn’t disappear\./);
+  assert.match(home, /The money came back\.<\/h3><p>The broken promise didn’t disappear\./);
   assert.doesNotMatch(home, /The record remembers|does not erase an earlier breach/);
 });
 
@@ -43,7 +44,7 @@ test("4 proof verdict terminology and assurance remain separate", () => {
 
 test("5 required safety disclosures remain discoverable", () => {
   for (const phrase of [
-    "Anchor measurable terms before the outcome",
+    "The terms go on Elysium Testnet before the period begins",
     "entire block window",
     "temporary breach remains a failure",
     "Proven and Not proven",

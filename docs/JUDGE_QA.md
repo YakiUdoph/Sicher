@@ -1,157 +1,157 @@
 # Sicher Judge Q&A
 
-## Product and problem
+Each answer starts with the plain-English product answer. Technical boundaries follow where they matter.
 
-### What exactly is Sicher?
+## What is Sicher?
 
-Sicher records a minimum-balance commitment before its outcome, reconstructs the completed interval, and publishes a repeatable verdict with a readable off-chain receipt. It currently runs on Elysium Testnet.
+Sicher records a measurable wallet promise before its outcome and checks whether it held throughout the whole period.
 
-### Why does this need blockchain?
+Current V1 supports minimum-balance commitments on Elysium Testnet. Commitment terms are on-chain; historical evaluation and Receipt V3 are off-chain.
 
-The registry supplies publicly readable, ordered commitment terms and creation evidence that the user cannot later edit through the contract. Token transfers and block ordering provide the historical evidence being evaluated. The verifier and receipt remain off-chain.
+## Explain it in one sentence.
 
-### Why isn't a wallet explorer enough?
+A wallet can look healthy today and still have broken its promise yesterday, so Sicher records the promise first and checks the whole period.
 
-A typical balance view answers “what is the balance now?” It does not by itself establish whether a threshold held throughout a past interval.
+## Who would actually use it?
 
-### Why isn't a snapshot enough?
+Two sides: projects or organizations making measurable financial commitments, and communities, partners, funders, or other stakeholders checking them.
 
-A snapshot can be taken after funds return. Commitment #2 ended at 100,000 STEST but temporarily fell to 15,000 against an 80,000 minimum.
+These are target use cases, not claims of current customers or adoption.
 
-### What stops someone changing the terms later?
+## Give me a real use case.
 
-The deployed registry has no update or delete function for a stored commitment. A new commitment can be created, but the earlier record remains.
+A project publicly promises to keep at least 80,000 tokens in a treasury wallet during a defined period. A funder or community later checks whether that condition held throughout the period—not only at the end.
 
-### What if funds leave temporarily and return?
+Commitment #2 is the working testnet example: `100,000 -> 92,000 -> 15,000 -> 100,000`, producing `NOT_PROVEN`.
 
-The ordered interval reconstruction retains the low point. Recovery changes the later balance, not the earlier breach.
+## Why would a project voluntarily use this?
 
-## Verification and receipts
+To make a financial commitment more credible before asking others to trust it. Recording exact terms in advance gives partners or communities something concrete to check later.
 
-### Where is the verdict computed?
+It does not protect the wallet or prevent a breach. It makes the promise and outcome inspectable.
 
-In the off-chain verifier, using registry terms and accepted historical evidence. The same accepted inputs produce the same result.
+## Why can't I just use a block explorer?
 
-### Is the verdict on-chain?
+A typical explorer balance shows what is in a wallet now. Sicher answers a different question: did the wallet stay above a pre-recorded minimum throughout a past period?
 
-No.
+A technical reviewer could reconstruct the same history manually from suitable chain data. Sicher turns that work into a focused commitment, result, and receipt flow.
 
-### Is the receipt on-chain?
+## Why can't I just monitor the wallet?
 
-No. Receipt V3 is an off-chain JSON artifact with canonical digest and frozen provenance checks.
+You can build monitoring, but you still need agreed terms before the outcome, complete interval history, safe failure behavior, and a result people can inspect. Sicher packages those requirements around a measurable commitment.
 
-### Is Sicher trustless?
+## Why does this need Elysium?
 
-No. It depends on reviewed local software, configuration, configured RPC operators, and shared Elysium infrastructure.
+The original promise is recorded on Elysium Testnet before the outcome. That provides an independently inspectable record of the wallet, token, minimum, and block period.
 
-### What does Corroborated actually mean?
+Sicher then evaluates historical Elysium activity. It does not claim that blockchain removes every trust problem.
 
-The frozen process compared required evidence across its configured sources and checked discovered relevant events against transaction receipts. It is an assurance level, not a verdict or a claim of mathematically complete history.
+## What stops someone changing the promise afterward?
 
-### Can providers omit events?
+The deployed registry has no update or delete path for a stored commitment. A person can create a new commitment, but the earlier record remains.
 
-Yes. Disagreement or a one-sided omission is designed to fail closed, but correlated omission across all configured sources and shared infrastructure cannot be mathematically excluded.
+## What happens if funds leave and later return?
 
-### What token types are supported?
+The temporary breach remains part of the result. Returning the funds changes the later balance; it does not erase what happened earlier.
 
-The frozen evidence supports the reviewed conventional STEST ERC-20 accounting model. Rebasing, fee-on-transfer, and hidden balance mutations are unsupported.
+Commitment #2 ended back at 100,000 STEST but remains Not proven because it fell to 15,000 against an 80,000 minimum.
 
-### What happens if evidence is unavailable?
+## What exactly is Proven?
 
-Missing, malformed, incomplete, wrong-chain, unfinalized, or disagreeing required evidence does not produce `PROVEN`. The applicable state remains `PENDING` or becomes `INDETERMINATE`.
+The measurable commitment held throughout the evaluated period.
 
-## Contract and wallet behavior
+Technically, `PROVEN` appears only when the supported historical evidence, finality, registry terms, reconstruction, receipt, and publication checks all pass.
 
-### Who creates the commitment?
+## What exactly is Not proven?
 
-The wallet/user creates their own public registry commitment through an authorized transaction. The registry is also directly callable.
+The commitment was broken during the evaluated period. For `MIN_BALANCE`, at least one validated balance point fell below the promised minimum.
 
-### Can someone create a commitment for a past range directly through the contract?
+## What does Corroborated mean?
 
-Yes. The deployed contract requires `endBlock > startBlock` but does not require a future start.
+Checked across multiple configured sources. It is an assurance level, not the verdict and not a claim of mathematical certainty.
 
-### Why is that allowed currently?
+The current sources still share Elysium infrastructure, so correlated omission cannot be excluded.
 
-The frozen minimal contract records terms only. Future-start enforcement was added later in the frontend without changing the deployed contract or historical evidence. Contract-level enforcement is roadmap work.
+## What happens if Sicher cannot safely verify something?
 
-### What prevents duplicate commitments?
+It does not guess. The commitment stays in a nonterminal checking, delayed, pending, or indeterminate state without a Proven or Not proven result.
 
-The browser prevents common accidental duplicate sends through synchronous locking and persisted ambiguity states. The contract does not enforce uniqueness, so direct or cross-device duplicates remain possible.
+Missing, malformed, unsupported, wrong-chain, inconsistent, or unfinalized evidence fails closed.
 
-### What happens if the wallet broadcasts but fails to return a hash?
+## What works today?
 
-The browser records public attempt metadata, blocks immediate retry, and offers bounded read-only event reconciliation. Zero matches remain unresolved and multiple matches remain ambiguous.
+- `MIN_BALANCE` commitments on Elysium Testnet.
+- User-authorized registry transactions.
+- Dynamic commitment discovery.
+- Historical evaluation for the reviewed conventional STEST model.
+- Receipt V3 validation and public results.
+- `PROVEN` / `NOT_PROVEN` when required evidence passes.
+- Safe nonterminal states otherwise.
+- Automatic off-browser processing, protected publication, and runtime frontend discovery.
 
-### Does Sicher custody funds?
+## What doesn't work today?
 
-No. The browser asks the wallet to authorize a zero-value registry call; Sicher does not hold the user's keys or STEST.
+No Mainnet, production assets, arbitrary ERC-20 support, custody, escrow, wallet protection, `MAX_OUTFLOW`, or finalized `$SICHER` utility. Future-start enforcement is not in the deployed contract, and receipt/evidence guarantees remain bounded by shared infrastructure.
 
-### Can Sicher move users' tokens?
+## Is this production ready?
 
-The current frontend and registry transaction do not contain a token-transfer function. The user's own wallet remains able to move its tokens independently.
+No. Sicher is a working Elysium Testnet V1 with one rule and a reviewed demonstration token model. It retains documented contract, provider, receipt, browser, and wallet limitations.
 
-### Does Sicher request approvals?
+## Why is this original?
 
-No token approval flow or approval method is present in the audited source or deployed bundle.
+Sicher is not just showing today's balance. It evaluates whether a **pre-recorded measurable commitment** held across its **defined period**.
 
-### Does Sicher request signatures?
+The distinctive product moment is #2: the ending balance recovered, but the broken promise did not disappear. Sicher does not claim to have invented blockchain monitoring or reserve verification.
 
-No message-signing or typed-data-signing method is present. The only write request is the explicit registry transaction.
+## What is the long-term vision?
 
-## Token and business
+Make important financial promises independently checkable before people are asked to trust them.
 
-### What is STEST?
+Possible next work includes broader measurable treasury rules, easier result sharing, profiles, notifications, and recurring workflows. Production networks, APIs, and organizational tooling are later exploratory directions, not current capabilities.
 
-Sicher Test Token, the reviewed demonstration token on Elysium Testnet.
+## How could this become sustainable?
 
-### Is STEST `$SICHER`?
+A possible future model is paid advanced tooling for organizations making recurring commitments: organization management, verification operations, reporting, or integrations. Public results could remain useful to communities, partners, and funders.
 
-No. The repository assigns no `$SICHER` identity, economic value, or finalized utility to STEST.
+Sicher does not currently claim pricing, customers, or revenue.
 
-### What is the business model?
+## What happens after the competition?
 
-A hypothesis: organizations may pay for historical commitment checks, monitoring, reporting, integrations, operational support, or higher-assurance evidence. It is not validated revenue.
+Continue validating the user problem, improve the single supported workflow, strengthen evidence independence and operations, and test whether organizations actually want recurring commitment tooling.
 
-### Who would pay?
+There is no invented launch date, Mainnet promise, partnership, or token-economics commitment.
 
-Potential buyers include grant programs, ecosystem programs, DAOs, treasuries, and counterparties that need measurable historical commitments. No current customers are claimed.
+## What are the biggest current limitations?
 
-### Who are the competitors or alternatives?
+- Testnet-only scope and STEST demonstration asset.
+- `MIN_BALANCE` only.
+- Conventional ERC-20 `Transfer` accounting only.
+- Shared upstream evidence dependencies.
+- Off-chain receipts and verdict computation.
+- Frontend-only future-start enforcement in the deployed contract version.
+- Client-side duplicate safety and possible hashless-send ambiguity.
+- Not production-ready.
 
-Alternatives include manual wallet/explorer review, bespoke monitoring, treasury dashboards, RPC-indexed analytics, and audit/reporting services. A current competitive-market comparison is **UNKNOWN** and would require separate research.
+## Why should Ascend care about this project?
 
-## Operations and roadmap
+Sicher turns a concrete Elysium problem into a product a non-technical reviewer can understand: a final balance can hide a temporary breach, while a pre-recorded commitment plus interval history makes that breach visible.
 
-### What remains manual?
+The project demonstrates working execution, a specific user value, a distinctive interval-versus-snapshot product idea, and a restrained path beyond the test token. It does not claim guaranteed competition success.
 
-The operator currently initiates post-window verification, reviews retained evidence, generates and validates receipts, prepares public records, and publishes them.
+## Does Sicher custody or move funds?
 
-### What would you build next?
+No. The current flow records commitment terms with a zero-value registry transaction. Sicher does not hold keys, request token approvals, or provide escrow.
 
-Resolve domain security clearance, improve RPC resilience, automate completed-window verification/publication, strengthen evidence independence, and add contract-level future-start enforcement.
+## What is STEST?
 
-### Why Elysium?
+Sicher Test Token, used for the Elysium Testnet demonstration. It is not `$SICHER` and has no stated economic value or finalized utility.
 
-The implementation, deployed contracts, and frozen evidence are on Elysium Testnet. Claims about unique Elysium capabilities or organizer requirements are **NEEDS ORGANIZER VERIFICATION**.
+## Is the result or receipt on-chain?
 
-### What role could Ascend play?
+No. Commitment terms are stored in the Elysium registry. The verifier computes results off-chain, and Receipt V3 is an off-chain, digest-checked artifact.
 
-Potentially product feedback, ecosystem pilot introductions, security/infrastructure guidance, and commercialization support. Exact program support and expectations are **NEEDS ORGANIZER VERIFICATION**.
+## Why should judges trust the demo?
 
-### Is this production ready?
+The demo uses public registry terms, retained evidence, digest-checked receipts, frozen implementation fingerprints, public source, and completed wallet-free records #1 and #2. It also discloses its provider and operator assumptions instead of calling the system trustless.
 
-No. Sicher currently runs on Elysium Testnet, with verification performed by a Sicher operator, scoped token support, shared-provider limitations, frontend-only controls, and an unresolved external wallet-domain classification.
-
-### What security limitations remain?
-
-Correlated evidence omission, shared Elysium dependencies, unsupported token mechanics, human-controlled publication, client-only future-start/duplicate protections, hashless-send ambiguity, unsigned off-chain receipts, and ordinary browser/wallet/hosting risks.
-
-## Current warning and demo integrity
-
-### What is the current MetaMask warning?
-
-The production Vercel domain has been observed receiving a MetaMask malicious-site warning. A review request has been filed with MetaMask's `eth-phishing-detect` project. The audited source and deployed bundle showed no signing requests, token approvals, automatic transaction submission, secret collection, suspicious redirects, or externally injected runtime scripts. The classification root cause remains `UNKNOWN`; it is not described as a confirmed false positive.
-
-### Why should judges trust the demo?
-
-The demo uses immutable-on-record terms, retained evidence artifacts, digest-checked Receipt V3 files, frozen implementation fingerprints, public source, and completed wallet-free records #1/#2. It does not ask judges to connect a wallet or bypass a warning. Trust remains bounded by the documented provider, software, and operator assumptions.
+If a wallet security warning is active, the demo must not connect a wallet or bypass the warning.

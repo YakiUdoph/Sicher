@@ -145,8 +145,8 @@ test('15 known-hash ambiguous reconciliation remains read-only and protected', a
   assert.equal(result.state, TX_STATE.AMBIGUOUS); assert.equal(sends, 0); assert.ok(loadPendingTransaction(storage));
 });
 
-test('16 lifecycle copy discloses operator-run verification/publication', () => {
-  const main = source('frontend/src/main.jsx'); assert.match(main, /operator-run verification/); assert.match(main, /After its block window ends/); assert.doesNotMatch(main, /automatically (?:verified|published|corroborated)/i);
+test('16 lifecycle copy discloses safe off-browser verification and publication', () => {
+  const main = source('frontend/src/main.jsx'); assert.match(main, /After its block window ends, Sicher’s off-browser process checks the history and publishes a result only when validation safely completes/); assert.doesNotMatch(main, /operator-run verification|In this competition build/);
 });
 
 test('17 public-record disclosure is present before the transaction CTA', () => {

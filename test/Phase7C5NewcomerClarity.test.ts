@@ -14,13 +14,13 @@ const data = JSON.parse(read("frontend/public/data/commitments.json"));
 
 test("1 commitments are described as real Elysium testnet records, not demos", () => {
   assert.match(ui, /Real Elysium testnet record/i);
-  assert.match(main, /Real historical commitments recorded on Elysium Testnet/);
+  assert.match(main, /These measurable commitments were recorded on Elysium Testnet before their outcomes/);
   assert.doesNotMatch(ui, /fictional demo|demo values|mainnet|production data|live customer|real money/i);
 });
 
 test("2 STEST is explained truthfully and is never represented as $SICHER", () => {
   assert.match(main, /STEST is the Sicher Test Token used for these proofs/);
-  assert.match(main, /STEST is the test token used for this Elysium proof/);
+  assert.match(main, /STEST is used only for testnet proof demonstrations; it is not a launched economic token and has no stated economic value/);
   assert.doesNotMatch(ui, /\$SICHER|dollar[- ]SICHER/i);
 });
 
@@ -53,7 +53,7 @@ test("7 Corroborated has a compact human explanation", () => {
 
 test("8 the shared-upstream limitation remains accessible", () => {
   assert.match(components, /Shared upstream infrastructure means correlated omission cannot be mathematically excluded/);
-  assert.match(main, /Correlated upstream omission cannot be mathematically excluded/);
+  assert.match(main, /A correlated upstream omission cannot be mathematically excluded/);
 });
 
 test("9 official historical values, verdicts, and assurance are unchanged", () => {

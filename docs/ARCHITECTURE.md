@@ -2,7 +2,17 @@
 
 ## Scope
 
-This document describes the system currently deployed on Elysium Testnet. It separates deployed contracts, deterministic off-chain code, and steps performed by a Sicher operator.
+This document describes the system currently deployed on Elysium Testnet. It separates the on-chain commitment record, automatic off-browser evaluation/publication, and the browser presentation layer.
+
+## High-level flow
+
+1. A user records a measurable commitment on Elysium Testnet before the outcome.
+2. The commitment period happens.
+3. Off-browser code evaluates historical activity across the full period.
+4. A validated result and content-addressed receipt are published through protected automation.
+5. The frontend discovers the registry commitment and, when available, its validated result.
+
+The registry fixes what was promised. The off-chain verifier checks what happened. The browser presents those two sources without inventing a verdict.
 
 ## System view
 
@@ -18,17 +28,12 @@ flowchart LR
     Token[STEST ERC-20 Transfer history]
   end
 
-  subgraph Code[OFF-CHAIN AUTOMATED CODE]
+  subgraph Code[OFF-BROWSER AUTOMATED CODE]
     Acquire[Evidence acquisition]
     Verify[Deterministic verifier]
     Receipt[Receipt V3 construction and validation]
-    Prepare[Prepared public records]
-  end
-
-  subgraph Operator[SICHER OPERATOR]
-    Run[Run completed-window verification]
-    Review[Review and retain evidence]
-    Publish[Publish prepared record]
+    Gate[Protected publication gates]
+    Publish[Runtime result store]
   end
 
   UI -->|explicit connect and reviewed transaction| Wallet
@@ -36,13 +41,12 @@ flowchart LR
   Registry -->|read-only discovery and immutable terms| UI
   Registry -->|terms and CommitmentCreated| Acquire
   Token -->|balanceOf and Transfer evidence| Acquire
-  Run --> Acquire
+  Registry -->|eligible completed commitments| Acquire
   Acquire --> Verify
   Verify --> Receipt
-  Receipt --> Review
-  Review --> Prepare
-  Prepare --> Publish
-  Publish --> UI
+  Receipt --> Gate
+  Gate --> Publish
+  Publish -->|index and content-addressed receipt| UI
 ```
 
 ## Component boundaries
@@ -76,13 +80,11 @@ STEST provides the conventional ERC-20 `Transfer` history used by the frozen evi
 
 “Automated code” describes what the software does when invoked. It does not mean the end-to-end post-window workflow is autonomously scheduled.
 
-### Current human operations
+### Automatic lifecycle and protected publication
 
-- Detecting that a window is ready for final verification.
-- Selecting and running the configured verifier workflow.
-- Reviewing failures and retained evidence.
-- Generating and validating Receipt V3 artifacts.
-- Preparing and publishing the public frontend records.
+The current off-browser lifecycle scans eligible commitments, evaluates at most the bounded supported work per run, validates Receipt V3 and publication transitions, and updates the runtime result store through a protected branch/PR process. Scheduler state can advance without inventing a result. Existing results are append-only under the transition rules.
+
+Automation does not weaken the evidence boundary. Unsupported, incomplete, inconsistent, wrong-chain, or unfinalized inputs do not become terminal results. Repository owners retain operational control of the publication authorization gate and protected-branch policy.
 
 ## A. Creating a commitment
 
@@ -129,8 +131,8 @@ The ordering is required because multiple balance-changing transfers can occur w
 2. Canonical serialization omits the receipt-digest field while computing its SHA-256 digest.
 3. The exported validator checks schema and digest integrity.
 4. Frontend-data preparation additionally binds the record to frozen evidence, implementation fingerprints, and approved path provenance.
-5. The operator publishes the prepared record.
-6. The browser loads and renders the prepared record; it does not recompute or upgrade the verdict.
+5. Protected automation publishes the validated index entry and content-addressed receipt only after transition checks pass.
+6. The browser loads and validates the runtime index and receipt; it does not recompute or upgrade the verdict.
 
 Receipt files are editable local/public files. Their digest is tamper-evident when compared with an expected value, but the receipt is not signed or anchored on-chain.
 
@@ -138,7 +140,9 @@ Receipt files are editable local/public files. Their digest is tamper-evident wh
 
 Explore obtains existence and immutable terms from the canonical registry. During one load it verifies the chain, reads the head, snapshots `nextCommitmentId` once, and reads the resulting finite ID range with bounded concurrency. A malformed or partial registry read fails the complete live view rather than appearing as zero commitments.
 
-The prepared public receipt dataset is a separate enrichment source. A terminal result is used only when its ID, creator, subject, token, minimum, and block range agree with the registry record. Without a matching published receipt, the head determines only `Scheduled`, `Proof running`, or `Awaiting result`; it never determines `PROVEN`, `NOT_PROVEN`, or `CORROBORATED`.
+The runtime public result store is a separate enrichment source. A terminal result is used only when its ID, creator, subject, token, minimum, and block range agree with the registry record and its receipt passes integrity checks. Without a matching published receipt, the head and publication state determine only nonterminal lifecycle labels; they never determine `PROVEN`, `NOT_PROVEN`, or `CORROBORATED`.
+
+The frontend loads its packaged validated baseline and then discovers runtime results from the configured public result index. This allows a later valid result to appear without a source edit or frontend rebuild. Runtime failure retains only already validated fallback data and marks unresolved ended commitments safely rather than guessing.
 
 ## Fail-closed behavior
 

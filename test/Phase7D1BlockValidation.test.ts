@@ -73,7 +73,7 @@ test('9 valid future terms pass client validation', () => assert.equal(validateC
 
 test('10 successful creation remains active and never means Proven', () => {
   const source = readFileSync(resolve(ROOT, 'frontend/src/main.jsx'), 'utf8');
-  assert.match(source, /commitment is active; final evaluation is not yet available/i);
+  assert.match(source, /The period is active\. It is not Proven, and no terminal receipt exists/);
   assert.match(source, /It is not Proven, and no terminal receipt exists/);
 });
 

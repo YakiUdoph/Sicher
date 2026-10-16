@@ -49,7 +49,7 @@ test("3 home renders the optimized hero as decorative imagery", () => {
 test("4 approved hero copy and Commitment #2 overlay remain", () => {
   const source = read("frontend/src/main.jsx");
   const home = source.slice(source.indexOf("function Home()"), source.indexOf("function Explore()"));
-  for (const phrase of ["Proof,", "not promises.", "Make a measurable commitment.", "Sicher keeps the record.", "Start a proof", "Explore proofs"]) assert.match(home, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  for (const phrase of ["A healthy balance", "can hide a broken promise.", "A wallet can look healthy today and still have broken its promise yesterday.", "Sicher records the commitment first and checks the whole period.", "Make a commitment", "Check a commitment"]) assert.match(home, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.match(home, /find\(\(item\) => item\.id === '2'\)/);
   assert.match(home, /<VerifiedProofCard commitment=\{breach\} featured \/>/);
 });

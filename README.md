@@ -2,109 +2,120 @@
 
 **Proof, not promises.**
 
-A promise can look perfectly kept today even if it was broken yesterday.
+A wallet can look healthy today and still have broken its promise yesterday.
 
-Sicher lets someone set a measurable commitment in advance, keeps the original terms on Elysium, and checks what happened across the entire period—not just what the wallet looks like at the end.
+Sicher records a measurable wallet commitment before it begins, then checks whether that commitment held throughout the whole period. It is for two sides:
 
-If the commitment was broken temporarily and the funds later returned, the record still shows it.
+- **Promise makers:** projects or organizations making measurable treasury, reserve, grant-related, or community fund commitments.
+- **Promise checkers:** communities, partners, funders, and other stakeholders who need to inspect those commitments.
 
-## The problem
+These are intended use cases, not claims of current customers or adoption.
 
-A project can promise to keep at least a stated balance for an interval, temporarily move funds out, restore them before anyone checks, and appear compliant if the reviewer looks only at the final balance. A current snapshot cannot establish what happened throughout a past interval.
+## Why today's wallet balance is not enough
 
-## What Sicher does
+Imagine a project promises:
 
-1. The user records the subject, token, minimum balance, and block interval before the outcome.
-2. After the interval, the verifier reconstructs the balance across the full inclusive block range.
-3. A temporary drop below the minimum remains a breach even if the balance later recovers.
-4. Fixed terms and the same accepted evidence produce the same verdict.
-5. Sicher prepares a human-readable Receipt V3 and a public product record.
+> We will keep at least 80,000 tokens in this wallet during this period.
 
-V1 supports one rule: `MIN_BALANCE` for the reviewed conventional ERC-20 accounting model.
+The balance then moves:
 
-## Real example
+```text
+100,000 -> 92,000 -> 15,000 -> 100,000
+```
 
-Commitment #2 promised at least **80,000 STEST**. Its verified historical path was:
+The wallet looks healthy at the beginning and end. During the period, however, it fell to 15,000 and broke the promise.
+
+**The money came back. The broken promise didn't disappear.**
+
+A current wallet view answers, “What is in this wallet now?” It does not necessarily answer, “Did this wallet stay above the promised amount throughout the entire period?” Sicher exists for that second question.
+
+## What you can do
+
+- **Making the promise?** Use **Make a commitment** to record measurable terms before the outcome.
+- **Checking somebody's promise?** Use **Explore commitments** to inspect public commitments and any validated results.
+- **Want the clearest example?** Open Commitment #2 and follow the full balance path rather than only its final balance.
+
+Live testnet application: <https://sicherd.vercel.app/>
+
+## The real #2 example
+
+Commitment #2 promised at least **80,000 STEST**. Its validated historical path was:
 
 ```text
 100,000 -> 92,000 -> 15,000 -> 100,000 STEST
 ```
 
-The final balance recovered to 100,000 STEST, but the interval included a 15,000 STEST balance. The result is therefore **NOT_PROVEN / CORROBORATED**. Recovery does not erase the earlier breach.
+The result is **NOT_PROVEN / CORROBORATED** because the commitment was broken during the period. `CORROBORATED` means the evidence was checked across multiple configured sources; it does not mean absolute mathematical certainty.
 
-Commitment #1 is the positive control: it promised at least 80,000 STEST, its minimum observed balance was 92,000 STEST, and its result is **PROVEN / CORROBORATED**.
+Commitment #1 is the positive example. It promised at least 80,000 STEST, never fell below 92,000 STEST in the validated path, and is **PROVEN / CORROBORATED**.
 
-The frozen receipt evidence is in [`evidence/`](evidence/). Explore discovers every genuine commitment from the canonical registry; the validated public receipt dataset currently supplies terminal results only for commitments #1 and #2.
+## Why Elysium matters
 
-## Live product
+The commitment is recorded on Elysium Testnet before the outcome. That creates an independently inspectable record of:
 
-- Website: <https://sicherd.vercel.app/>
-- Network: Elysium Testnet
-- Release status: live on Elysium Testnet; not production-ready
+- the wallet being measured;
+- the token;
+- the minimum balance; and
+- the applicable block period.
 
-At the time of this release, review of a MetaMask malicious-site classification for the production Vercel domain is pending. If a wallet provider presents an active security warning, do not bypass it and do not connect the wallet. The completed public proofs remain available for wallet-free review.
+Sicher later evaluates the historical on-chain activity for that fixed period. The original promise should not become whatever somebody says it was after the outcome is known.
 
-## Architecture
+This does not remove every trust assumption. Results are produced off-chain and remain bounded by the documented verifier, evidence sources, infrastructure, and token-accounting model.
 
-```text
-User -> browser -> injected wallet -> Sicher registry on Elysium Testnet
-                                      |
-                                      v
-                         historical Transfer evidence
-                                      |
-                                      v
-                   off-chain verifier -> Receipt V3 -> public UI
-```
+## What works today
 
-The browser prepares and submits a user-authorized registry transaction. The registry records commitment terms and emits `CommitmentCreated`. Historical acquisition, reconstruction, verdict computation, receipt generation, and publication are off-chain. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Current V1 includes:
 
-## What's on-chain
+- `MIN_BALANCE` commitments only;
+- Elysium Testnet, chain ID `99801`;
+- conventional ERC-20 `Transfer` accounting for the reviewed test-token model;
+- immutable commitment terms in the Sicher registry;
+- user-authorized wallet transactions;
+- dynamic discovery of on-chain commitments;
+- historical evaluation across the commitment interval;
+- validated published results and Receipt V3 records;
+- `PROVEN` and `NOT_PROVEN` when sufficient evidence exists;
+- nonterminal checking or delayed states when a safe result is unavailable; and
+- automatic off-browser processing and protected publication infrastructure.
 
-- The registry address and its append-only commitment records.
-- Creator, subject, token, minimum balance, start block, and end block.
-- The `CommitmentCreated` event.
-- STEST `Transfer` activity used as historical evidence.
+Explore can show a real registry commitment without showing a terminal result. Existence proves that its terms were recorded; it does not prove the promise was kept.
 
-Verdicts and Receipt V3 files are not stored on-chain.
+## Status and identifiers
 
-## What's off-chain
-
-- Historical log acquisition and provider comparison.
-- Exact balance reconstruction and repeatable verdict computation.
-- Targeted transaction-receipt checks.
-- Receipt V3 generation and validation.
-- Preparation and publication of validated terminal records, currently #1 and #2.
-- Read-only browser discovery of immutable registry commitments and their current lifecycle timing.
-
-After the interval ends, a Sicher operator currently runs verification and publishes the validated result.
-
-## Contracts and addresses
+Sicher currently runs on Elysium Testnet. It is not production-ready.
 
 | Item | Value |
 | --- | --- |
-| Network | Elysium Testnet |
 | Chain ID | `99801` |
 | Sicher registry | `0x4e4887e28a8370678a9a37c08a85c65450b510c0` |
 | Sicher Test Token (STEST) | `0x14fc373Dce148766a3B8d9C2BF5f02F8dbe316a7` |
 
 STEST means **Sicher Test Token**. It is not `$SICHER`, and Sicher assigns it no economic value or promised utility.
 
-## Verified commitments
+At the time of this release, review of a MetaMask malicious-site classification for the production Vercel domain is pending. If a wallet provider presents an active warning, do not bypass it and do not connect. Existing public results remain available for wallet-free review.
 
-| Public record | Minimum | Minimum observed | Final balance | Result | Assurance |
+## How the system works
+
+```text
+1. A user records a measurable commitment on Elysium Testnet.
+2. The commitment period happens.
+3. Off-browser code evaluates the historical activity for the full period.
+4. A validated result and content-addressed receipt are published.
+5. The frontend displays the registry commitment and, when available, its result.
+```
+
+The browser prepares a user-authorized `createCommitment` transaction. The registry stores the terms and emits `CommitmentCreated`. Historical acquisition, reconstruction, verdict computation, receipt generation, and publication happen off-chain. The browser does not invent or recompute terminal verdicts.
+
+See [Architecture](docs/ARCHITECTURE.md) for the detailed system boundary.
+
+## Public result state
+
+| Public result | Minimum | Minimum observed | Final balance | Result | Assurance |
 | --- | ---: | ---: | ---: | --- | --- |
 | #1 | 80,000 STEST | 92,000 STEST | 92,000 STEST | `PROVEN` | `CORROBORATED` |
 | #2 | 80,000 STEST | 15,000 STEST | 100,000 STEST | `NOT_PROVEN` | `CORROBORATED` |
 
-Explore also shows registry-only commitments without inventing results. Commitments #3-#10 currently have no validated result in the published frontend dataset, so they appear as **Awaiting result**. The local #6/#7 receipts remain technical lifecycle evidence and do not cross the public publication boundary in this release.
-
-Registry existence and verification are different. Appearing in Explore confirms that a commitment and its immutable terms exist on-chain. `PROVEN`, `NOT_PROVEN`, and `CORROBORATED` appear only when the published validated receipt agrees with those registry terms.
-
-## Assurance
-
-`CORROBORATED` is an assurance level, not a verdict. For the frozen receipts, implemented checks compare evidence across the configured sources and verify discovered events against targeted transaction receipts. This protects against several incomplete or inconsistent evidence failures, but it is not mathematically exhaustive: correlated omission across providers and shared upstream Elysium infrastructure remains possible.
-
-See [`docs/COMPETITION_ASSURANCE_POLICY.md`](docs/COMPETITION_ASSURANCE_POLICY.md) and [`docs/COMPETITION_VERIFIER_FREEZE.md`](docs/COMPETITION_VERIFIER_FREEZE.md).
+Other discovered commitments do not receive invented terminal verdicts. A result appears only when a matching validated receipt agrees with the immutable registry terms.
 
 ## Running locally
 
@@ -118,7 +129,7 @@ npm.cmd --prefix frontend run build
 npm.cmd --prefix frontend run dev
 ```
 
-The frontend development server listens on port 3000. Local wallet interaction still targets Elysium Testnet; do not use private keys in repository files.
+The frontend development server listens on port 3000. Local wallet interaction still targets Elysium Testnet. Never place private keys, seed phrases, or wallet secrets in repository files.
 
 Run the complete test set:
 
@@ -126,9 +137,7 @@ Run the complete test set:
 node --test test/*.test.ts
 ```
 
-## Verification and reproduction
-
-The frozen evidence can be reviewed without sending a transaction:
+Review frozen evidence without sending a transaction:
 
 ```powershell
 npm.cmd run phase6:test-integrity
@@ -144,39 +153,63 @@ Key artifacts:
 - [`evidence/phase6b2-commitment2-receipt-v3.json`](evidence/phase6b2-commitment2-receipt-v3.json)
 - [`evidence/phase6-competition-freeze.json`](evidence/phase6-competition-freeze.json)
 - [`evidence/phase8a-competition-build-freeze.json`](evidence/phase8a-competition-build-freeze.json)
-- [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md), which records the earlier Phase 5 reproduction workflow
+- [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md)
 
-Live reconstruction requires suitable archive-capable Elysium RPC endpoints and the environment described by the existing scripts. It is read-only but depends on external infrastructure.
+Live reconstruction requires suitable archive-capable Elysium RPC endpoints and remains read-only, but it depends on external infrastructure.
 
-## Security
+## Security and limitations
 
-The verifier and frontend fail closed on missing or inconsistent required evidence. The frontend does not receive private keys, requests no token approvals or signatures, and submits only an explicitly reviewed `createCommitment` transaction. These properties are scoped and do not make the system universally secure. See [`docs/SECURITY.md`](docs/SECURITY.md) and [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md).
+Sicher fails closed when required evidence is missing, malformed, inconsistent, wrong-chain, or not finalized. That does not make it universally secure.
 
-## Limitations
+Current limitations include:
 
-- Elysium Testnet only.
-- V1 supports `MIN_BALANCE` only.
-- Verification assumes the reviewed conventional ERC-20 `Transfer` accounting model; rebasing, fee-on-transfer, and hidden balance mutations are unsupported.
-- Future-start enforcement is implemented in the frontend. The deployed contract accepts a direct call with an already-started or past range if `endBlock > startBlock`.
-- A Sicher operator currently runs verification, generates Receipt V3, and publishes the public record.
-- `CORROBORATED` does not mathematically eliminate correlated provider omission.
-- Browser duplicate protection is not protocol-level uniqueness; identical commitments remain possible.
-- A provider or wallet failure after broadcast but before returning a transaction hash can remain ambiguous.
-- Receipt files are digest-checked local artifacts, not signed or on-chain records.
-- STEST is a test token, not a production asset.
-- The production wallet-domain classification remains under external review.
+- Elysium Testnet only;
+- `MIN_BALANCE` only;
+- conventional ERC-20 `Transfer` accounting only;
+- no custody, escrow, wallet protection, or token-approval flow;
+- frontend-only future-start enforcement in the deployed contract version;
+- client-side, not protocol-level, duplicate protection;
+- possible ambiguity if a wallet broadcasts but returns no transaction hash;
+- correlated provider or shared-infrastructure omission cannot be mathematically excluded;
+- Receipt V3 files are digest-checked off-chain records, not signatures or on-chain verdicts; and
+- STEST is a demonstration token, not a production asset.
 
-## Status
+Read [Security](docs/SECURITY.md), [Threat model](docs/THREAT_MODEL.md), and the [Assurance policy](docs/COMPETITION_ASSURANCE_POLICY.md) before treating a result as evidence.
 
-Sicher currently runs on Elysium Testnet. Explore reads genuine commitments from the canonical registry, while the complete validated proof stories for commitments #1 and #2 remain separately receipt-backed. It is not production-ready.
+## Long-term direction
+
+The larger direction is simple:
+
+> Make important financial promises independently checkable before people are asked to trust them.
+
+### Now
+
+Minimum-balance commitments on Elysium Testnet.
+
+### Next — possible future work
+
+- broader measurable treasury or reserve commitment rules;
+- easier ways to share public commitment results;
+- project or organization profiles;
+- notifications; and
+- improved recurring-commitment workflows.
+
+### Later — exploratory
+
+- production assets or networks after separate review;
+- integrations and APIs;
+- organizational tooling; and
+- recurring financial commitment programs.
+
+A possible future business model is that organizations making recurring commitments pay for advanced organizational, verification, reporting, or integration tooling while public results remain useful to communities, partners, and funders. Sicher does not currently claim pricing, customers, or revenue.
 
 ## Documentation
 
 - [Product requirements](docs/PRD.md)
+- [User guide](docs/USER_GUIDE.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Security](docs/SECURITY.md)
-- [User guide](docs/USER_GUIDE.md)
 - [Roadmap](docs/ROADMAP.md)
-- [Competition submission draft](docs/COMPETITION_SUBMISSION.md)
+- [Competition submission](docs/COMPETITION_SUBMISSION.md)
 - [Demo script](docs/DEMO_SCRIPT.md)
 - [Judge Q&A](docs/JUDGE_QA.md)

@@ -116,6 +116,6 @@ test('10 future-start revalidation happens before fee preparation', async () => 
 
 test('11 transaction success still cannot imply Proven', () => {
   const source = readFileSync(resolve(ROOT, 'frontend/src/main.jsx'), 'utf8');
-  assert.match(source, /commitment is active; final evaluation is not yet available/i);
+  assert.match(source, /The period is active\. It is not Proven, and no terminal receipt exists/);
   assert.match(source, /It is not Proven/);
 });
