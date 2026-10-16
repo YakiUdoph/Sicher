@@ -1,10 +1,12 @@
 import "dotenv/config";
 import { Buffer } from "node:buffer";
 import { RESULTS_BRANCH, publishThroughProtectedPullRequest, validateStoreSnapshot, type GitHubPublicationApi, type PullRequestState, type StoreSnapshot } from "./phase10b-pr-publication.ts";
+import { readExpectedPublicationTransition } from "./phase10b-transition-provenance.ts";
 
 const token = process.env.GITHUB_TOKEN?.trim(); const repository = process.env.GITHUB_REPOSITORY?.trim();
 const temporaryBranch = process.env.PHASE10B_TEMPORARY_BRANCH?.trim(); const expectedTargetSha = process.env.PHASE10B_EXPECTED_TARGET_SHA?.trim(); const expectedHeadSha = process.env.PHASE10B_EXPECTED_HEAD_SHA?.trim();
-if (!token || !repository || !temporaryBranch || !expectedTargetSha || !expectedHeadSha) throw new Error("GitHub PR publication environment is incomplete.");
+const expectedTransitionPath = process.env.PHASE10B_EXPECTED_TRANSITION_PATH?.trim();
+if (!token || !repository || !temporaryBranch || !expectedTargetSha || !expectedHeadSha || !expectedTransitionPath) throw new Error("GitHub PR publication environment is incomplete.");
 if (!temporaryBranch.startsWith("sicher-results-publish-")) throw new Error("Unexpected temporary publication branch name.");
 const apiBase = process.env.GITHUB_API_URL?.trim() || "https://api.github.com";
 async function request(path: string, init: RequestInit = {}, acceptedStatuses: readonly number[] = []): Promise<any> {
@@ -31,5 +33,5 @@ const api: GitHubPublicationApi = {
   async closePullRequest(number) { await request(`/pulls/${number}`, { method: "PATCH", body: JSON.stringify({ state: "closed" }) }); },
   async deleteBranch(branch) { await request(`/git/refs/heads/${encodeURIComponent(branch)}`, { method: "DELETE" }, [404]); },
 };
-const result = await publishThroughProtectedPullRequest({ api, temporaryBranch, expectedTargetSha, expectedHeadSha });
+const result = await publishThroughProtectedPullRequest({ api, temporaryBranch, expectedTargetSha, expectedHeadSha, expectedTransition: await readExpectedPublicationTransition(expectedTransitionPath) });
 console.log(`pull=${result.pullNumber} transition=${result.newId ? `commitment-${result.newId}` : "scheduler-only"} merge=${result.mergeSha}`);

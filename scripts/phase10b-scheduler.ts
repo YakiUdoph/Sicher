@@ -26,6 +26,7 @@ export type SchedulerState = Readonly<{
   failures: Readonly<Record<string, SchedulerFailure>>;
   scanIssues: Readonly<Record<string, SchedulerScanIssue>>;
 }>;
+export type SchedulerSnapshot = Readonly<{ hasSchedulerFile: boolean; scheduler: SchedulerState }>;
 
 export type IsolatedScanIssue = Readonly<{ id: string; classification: FailureClassification; code: string }>;
 export type IsolatedRegistrySnapshot = RegistrySnapshot & Readonly<{ issues: readonly IsolatedScanIssue[] }>;
@@ -41,8 +42,12 @@ export function emptySchedulerState(): SchedulerState {
 }
 
 export async function readSchedulerState(storeRoot: string): Promise<SchedulerState> {
-  try { return validateSchedulerState(JSON.parse(await readFile(join(storeRoot, SCHEDULER_PATH), "utf8"))); }
-  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return emptySchedulerState(); throw error; }
+  return (await readSchedulerSnapshot(storeRoot)).scheduler;
+}
+
+export async function readSchedulerSnapshot(storeRoot: string): Promise<SchedulerSnapshot> {
+  try { return Object.freeze({ hasSchedulerFile: true, scheduler: validateSchedulerState(JSON.parse(await readFile(join(storeRoot, SCHEDULER_PATH), "utf8"))) }); }
+  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return Object.freeze({ hasSchedulerFile: false, scheduler: emptySchedulerState() }); throw error; }
 }
 
 export async function writeSchedulerState(storeRoot: string, scheduler: SchedulerState): Promise<void> {

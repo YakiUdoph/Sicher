@@ -67,6 +67,7 @@
     "phase10b1:test": "node --test test/Phase10B1ProtectedPRPublication.test.ts",
     "phase10b2:test": "node --test test/Phase10B2ActivationRemediation.test.ts",
     "phase10b6:test": "node --test test/Phase10B6LifecycleHardening.test.ts",
+    "phase10b9:test": "node --test test/Phase10B9SchedulerTransitionProvenance.test.ts",
     "phase10b:bootstrap-results": "node scripts/phase10b-bootstrap-results.ts",
     "typecheck": "tsc --noEmit"
   },

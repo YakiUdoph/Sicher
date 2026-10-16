@@ -56,6 +56,7 @@ jobs:
         env:
           PHASE10B_RESULTS_BRANCH_PROTECTED: ${{ vars.SICHER_RESULTS_BRANCH_PROTECTED }}
           PHASE10B_RESULTS_ROOT: .phase10b-results
+          PHASE10B_EXPECTED_TRANSITION_PATH: .phase10b-expected-transition.json
           PHASE10B_MAX_RESULTS: "1"
           PHASE10B_MANUAL_COMMITMENT_ID: ${{ github.event_name == 'workflow_dispatch' && inputs.commitment_id || '' }}
           PHASE6_CHAIN_ID: "99801"
@@ -75,6 +76,7 @@ jobs:
         env:
           PHASE10B_BASELINE_ROOT: .phase10b-baseline
           PHASE10B_RESULTS_ROOT: .phase10b-results
+          PHASE10B_EXPECTED_TRANSITION_PATH: .phase10b-expected-transition.json
         run: node scripts/phase10b-pr-preflight.ts
       - name: Commit and push temporary publication branch
         if: steps.publication_change.outputs.changed == 'true'
@@ -95,4 +97,5 @@ jobs:
         if: steps.publication_change.outputs.changed == 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          PHASE10B_EXPECTED_TRANSITION_PATH: .phase10b-expected-transition.json
         run: node scripts/phase10b-publish-pr.ts

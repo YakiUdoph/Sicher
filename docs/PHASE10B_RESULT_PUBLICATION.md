@@ -30,9 +30,13 @@ It contains no receipt, proof verdict, assurance claim, or immutable commitment 
 
 The generic selector starts after the cursor, wraps numerically, skips published, unsupported-token, active, unfinalized, and not-yet-due retry records, and attempts at most one candidate per run. The cursor advances after both success and failure, so one unresolved ID cannot starve later IDs. Transient failures retry after 6, 12, then at most 24 hours. Deterministic or repeatedly unresolved failures retry every seven days; an explicit manual target may request an earlier re-evaluation but still passes every eligibility, provider, verifier, Receipt V3, fingerprint, first-publication-wins, and protected-PR check.
 
+If the protected store has no `scheduler.json`, the worker binds that absence to the canonical empty scheduler state. The first accepted failed attempt creates only `scheduler.json`; the first accepted successful attempt creates `scheduler.json` atomically with exactly one index entry and one content-addressed receipt. Existing index entries and receipt bytes remain immutable.
+
 Chain identity, the agreed finalized head, and the agreed registry upper bound remain global fail-closed invariants. A failure or disagreement while reading one commitment is isolated to that ID, recorded diagnostically, and never accepted from only one provider. Independently agreed later IDs remain schedulable.
 
 Scheduler-only progress and scheduler-plus-one-result progress both use a temporary branch, validated pull request, squash merge, and post-merge head verification. Ordinary transitions cannot change activation state, existing results, or existing receipts. A successful result must atomically advance the scheduler; a failed attempt may change only `scheduler.json`.
+
+The worker also creates an out-of-tree `sicher.expected-publication-transition/1.0` manifest from its actual scanner/verifier outcome. It binds the authoritative prior scheduler digest (including file presence), one fixed observation timestamp, exact scan issues, selected candidate, exact failure classification/code, or exact terminal result entry. The manifest is never committed to the result branch. Local preflight and the GitHub commit-tree check independently derive the only acceptable scheduler state from it and require exact equality before merge; deterministic attempt counts, cursor movement, retry time, result identity, and receipt path therefore cannot be supplied as free-form PR metadata.
 
 The scanner and browser retain a deliberate 10,000-record safety ceiling and fail closed above it. This is sufficient for the current competition/demo scale but is not an unlimited indexing architecture.
 

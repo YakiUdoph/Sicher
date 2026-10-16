@@ -4,6 +4,7 @@ import { join, relative } from "node:path";
 import { canonicalJson } from "./phase6-evidence-core.ts";
 import { validatePublicResultIndex, verifyPublicResultDocument, type PublicResultDocument, type PublicResultIndex } from "./phase10b-publication.ts";
 import { emptySchedulerState, retryDelayMilliseconds, SCHEDULER_PATH, validateSchedulerState, type SchedulerState } from "./phase10b-scheduler.ts";
+import { deriveExpectedSchedulerState, validateExpectedPublicationTransition, type ExpectedPublicationTransition } from "./phase10b-transition-provenance.ts";
 
 export const RESULTS_BRANCH = "sicher-results";
 export type StoreSnapshot = Readonly<{ index: PublicResultIndex; scheduler: SchedulerState; hasSchedulerFile: boolean; files: ReadonlyMap<string, string> }>;
@@ -47,7 +48,12 @@ export async function readStoreDirectory(root: string): Promise<StoreSnapshot> {
   return validateStoreSnapshot(index, files);
 }
 
-function validateSchedulerTransition(before: StoreSnapshot, after: StoreSnapshot, newId: string | null): boolean {
+function validateSchedulerTransition(before: StoreSnapshot, after: StoreSnapshot, newId: string | null, rawExpected: ExpectedPublicationTransition): boolean {
+  const { expected, scheduler: expectedScheduler } = deriveExpectedSchedulerState({ hasSchedulerFile: before.hasSchedulerFile, scheduler: before.scheduler }, rawExpected);
+  if (!after.hasSchedulerFile || canonicalJson(after.scheduler) !== canonicalJson(expectedScheduler)) throw new Error("Scheduler state does not match the trusted workflow outcome.");
+  if (expected.outcome.kind === "SUCCESS") {
+    if (newId !== expected.candidateId || canonicalJson(after.index.results[newId!] ?? null) !== canonicalJson(expected.outcome.entry)) throw new Error("Published result does not match the trusted successful candidate.");
+  } else if (newId !== null) throw new Error("A non-success scheduler transition cannot publish a terminal result.");
   const changed = canonicalJson(before.scheduler) !== canonicalJson(after.scheduler) || before.hasSchedulerFile !== after.hasSchedulerFile;
   if (before.hasSchedulerFile && !after.hasSchedulerFile) throw new Error("Scheduler state cannot be deleted.");
   const ids = new Set([...Object.keys(before.scheduler.failures), ...Object.keys(after.scheduler.failures)]);
@@ -73,7 +79,8 @@ function validateSchedulerTransition(before: StoreSnapshot, after: StoreSnapshot
   return changed;
 }
 
-export function validatePublicationTransition(before: StoreSnapshot, after: StoreSnapshot): PublicationTransition {
+export function validatePublicationTransition(before: StoreSnapshot, after: StoreSnapshot, rawExpected: ExpectedPublicationTransition): PublicationTransition {
+  const expected = validateExpectedPublicationTransition(rawExpected);
   if (before.index.automation.operational !== after.index.automation.operational) throw new Error("Publication PR cannot change automation activation state.");
   const beforeIds = Object.keys(before.index.results); const afterIds = Object.keys(after.index.results);
   for (const id of beforeIds) {
@@ -85,7 +92,7 @@ export function validatePublicationTransition(before: StoreSnapshot, after: Stor
   const newIds = afterIds.filter((id) => !before.index.results[id]);
   if (newIds.length > 1) throw new Error("A publication PR may add at most one terminal result.");
   const newId = newIds[0] ?? null;
-  const schedulerChanged = validateSchedulerTransition(before, after, newId);
+  const schedulerChanged = validateSchedulerTransition(before, after, newId, expected);
   const permitted = new Set(["index.json", SCHEDULER_PATH, ...(newId ? [after.index.results[newId].receiptPath] : [])]);
   const allPaths = new Set([...before.files.keys(), ...after.files.keys()]);
   const changed = [...allPaths].filter((path) => before.files.get(path) !== after.files.get(path)).sort();
@@ -96,10 +103,10 @@ export function validatePublicationTransition(before: StoreSnapshot, after: Stor
   return Object.freeze({ newId, changedFiles: Object.freeze(changed), schedulerChanged });
 }
 
-export function validatePullRequestState(input: { expectedTargetSha: string; currentTargetSha: string; expectedHeadSha: string; pull: PullRequestState; before: StoreSnapshot; after: StoreSnapshot }): PublicationTransition {
+export function validatePullRequestState(input: { expectedTargetSha: string; currentTargetSha: string; expectedHeadSha: string; pull: PullRequestState; before: StoreSnapshot; after: StoreSnapshot; expectedTransition: ExpectedPublicationTransition }): PublicationTransition {
   if (input.currentTargetSha !== input.expectedTargetSha || input.pull.baseSha !== input.expectedTargetSha) throw new Error("Target branch head changed unexpectedly.");
   if (input.pull.headSha !== input.expectedHeadSha) throw new Error("Pull request head changed unexpectedly.");
-  const transition = validatePublicationTransition(input.before, input.after);
+  const transition = validatePublicationTransition(input.before, input.after, input.expectedTransition);
   const listed = [...input.pull.changedFiles].map(normalize).sort();
   if (canonicalJson(listed) !== canonicalJson([...transition.changedFiles].sort())) throw new Error("Pull request changed-file list does not match the validated publication transition.");
   return transition;
@@ -115,12 +122,12 @@ export interface GitHubPublicationApi {
   deleteBranch(branch: string): Promise<void>;
 }
 
-export async function publishThroughProtectedPullRequest(input: { api: GitHubPublicationApi; temporaryBranch: string; expectedTargetSha: string; expectedHeadSha: string }): Promise<{ pullNumber: number; mergeSha: string; newId: string | null }> {
+export async function publishThroughProtectedPullRequest(input: { api: GitHubPublicationApi; temporaryBranch: string; expectedTargetSha: string; expectedHeadSha: string; expectedTransition: ExpectedPublicationTransition }): Promise<{ pullNumber: number; mergeSha: string; newId: string | null }> {
   let pullNumber: number | undefined; let merged = false;
   try {
     const before = await input.api.loadStore(input.expectedTargetSha);
     const candidate = await input.api.loadStore(input.expectedHeadSha);
-    const initial = validatePublicationTransition(before, candidate);
+    const initial = validatePublicationTransition(before, candidate, input.expectedTransition);
     const preOpenTargetSha = await input.api.getBranchHead(RESULTS_BRANCH);
     if (preOpenTargetSha !== input.expectedTargetSha) throw new Error("Target branch head changed before pull request creation.");
     pullNumber = await input.api.openPullRequest({ head: input.temporaryBranch, base: RESULTS_BRANCH, title: initial.newId ? `chore(results): publish commitment #${initial.newId}` : "chore(results): advance verification scheduler", body: initial.newId ? "Automated publication from the frozen off-browser verifier. This PR must contain exactly one content-addressed result and its atomic scheduler transition." : "Automated non-terminal scheduler progression. This PR must contain only validated scheduler state and cannot publish a result." });
@@ -128,14 +135,14 @@ export async function publishThroughProtectedPullRequest(input: { api: GitHubPub
     const pull = await input.api.getPullRequest(pullNumber);
     const refreshedBefore = await input.api.loadStore(currentTargetSha);
     const refreshedCandidate = await input.api.loadStore(pull.headSha);
-    const checked = validatePullRequestState({ expectedTargetSha: input.expectedTargetSha, currentTargetSha, expectedHeadSha: input.expectedHeadSha, pull, before: refreshedBefore, after: refreshedCandidate });
+    const checked = validatePullRequestState({ expectedTargetSha: input.expectedTargetSha, currentTargetSha, expectedHeadSha: input.expectedHeadSha, pull, before: refreshedBefore, after: refreshedCandidate, expectedTransition: input.expectedTransition });
     const result = await input.api.mergePullRequest(pullNumber, input.expectedHeadSha);
     if (!result.merged) throw new Error("GitHub refused the protected squash merge.");
     merged = true;
     const resultingHead = await input.api.getBranchHead(RESULTS_BRANCH);
     if (resultingHead !== result.sha) throw new Error("Result branch head does not match the reported squash merge commit.");
     const mergedStore = await input.api.loadStore(resultingHead);
-    validatePublicationTransition(before, mergedStore);
+    validatePublicationTransition(before, mergedStore, input.expectedTransition);
     return { pullNumber, mergeSha: result.sha, newId: checked.newId };
   } catch (error) {
     if (pullNumber !== undefined && !merged) await input.api.closePullRequest(pullNumber).catch(() => undefined);
