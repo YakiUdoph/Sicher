@@ -32,18 +32,18 @@ test("3 the balance sequence has nearby human context and remains adapter-bound"
 
 test("4 the minimum requirement is explained", () => {
   assert.match(main, /The balance had to stay at or above this amount for the whole commitment/);
-  assert.match(main, /This wallet committed to keep at least \{c\.minimumRequired\}/);
+  assert.match(ui, /Maintain at least \$\{commitment\.minimumRequired\} in this wallet throughout the recorded period/);
 });
 
 test("5 Proven has a scoped plain-English meaning", () => {
-  assert.match(main, /Proven — the balance stayed at or above the promised minimum for the full period/);
-  assert.match(main, /The promise was kept for the full recorded period/);
+  assert.match(main, /The wallet remained at or above its recorded minimum throughout the verified period/);
+  assert.match(main, /The recorded minimum-balance condition held throughout the verified period/);
 });
 
 test("6 Not proven has a plain-English meaning", () => {
-  assert.match(main, /Not proven — the commitment was broken during the period/);
-  assert.match(main, /Breach — below the promised minimum/);
-  assert.match(main, /The balance recovered\. The breach didn’t disappear/);
+  assert.match(main, /The wallet fell below its recorded minimum during the commitment period/);
+  assert.match(main, /Breach — below the recorded minimum/);
+  assert.match(main, /The balance recovered\. The broken commitment didn’t disappear/);
 });
 
 test("7 Corroborated has a compact human explanation", () => {

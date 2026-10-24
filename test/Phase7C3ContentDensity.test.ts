@@ -26,11 +26,11 @@ test("2 the strongest historical example is shown without duplicate adjacent exp
 });
 
 test("3 Explore cards prioritize requirement, verdict, assurance, and observed minimum", () => {
-  assert.match(components, /<Eyebrow>Promise<\/Eyebrow>/);
-  assert.match(components, /\{commitment\.plainProofType\}/);
+  assert.match(components, /<Eyebrow>Recorded commitment<\/Eyebrow>/);
+  assert.match(components, /<CommitmentStatement commitment=\{commitment\} compact \/>/);
   assert.match(components, /<StatusPill status=\{commitment\.status\} label=\{commitment\.statusLabel\}/);
   assert.match(components, /className="assurance-label">\{commitment\.assuranceLabel\}/);
-  assert.match(components, /'Lowest balance' : 'Minimum observed'/);
+  assert.match(components, /<Eyebrow>Lowest observed<\/Eyebrow>/);
   const recordCard = components.slice(components.indexOf("export function VerifiedRecordCard"), components.indexOf("export function AssuranceNote"));
   assert.doesNotMatch(recordCard, /recoveryNote|What happened/);
 });
@@ -44,11 +44,11 @@ test("4 proof verdict terminology and assurance remain separate", () => {
 
 test("5 required safety disclosures remain discoverable", () => {
   for (const phrase of [
-    "The terms go on Elysium Testnet before the period begins",
-    "entire block window",
+    "The fixed terms go on Elysium Testnet before the period begins",
+    "full block window",
     "temporary breach remains a failure",
     "Proven and Not proven",
-    "Corroborated is an assurance level, not a verdict",
+    "Corroborated is an assurance level, not a result",
     "correlated upstream omission cannot be mathematically excluded",
     "conventional ERC-20 Transfer accounting",
     "not automatically Proven",
