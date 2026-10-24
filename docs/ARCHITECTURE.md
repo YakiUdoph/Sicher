@@ -78,7 +78,7 @@ STEST provides the conventional ERC-20 `Transfer` history used by the frozen evi
 - Receipt V3 construction, canonical digesting, and validation.
 - Frozen frontend-data preparation and validation.
 
-“Automated code” describes what the software does when invoked. It does not mean the end-to-end post-window workflow is autonomously scheduled.
+The scheduled workflow and activation controls are enabled. Current end-to-end operational health is degraded and failing closed: recent scheduled runs have repeatedly stopped because the configured providers disagreed on the finalized head.
 
 ### Automatic lifecycle and protected publication
 
@@ -125,6 +125,8 @@ Events are sorted lexicographically by:
 
 The ordering is required because multiple balance-changing transfers can occur within one block or transaction. Duplicate event keys are deduplicated; conflicting duplicates are rejected. Outgoing transfers subtract, incoming transfers add, and a self-transfer has zero net effect.
 
+Local EVM tests have a narrower ordering surface: sequential `EVM.runCall` results do not provide meaningful block numbers, transaction indexes, or log indexes. Those tests preserve actual call-execution and returned log-array order instead of fabricating chain-ordering fields. Live reconstruction always uses the canonical tuple above.
+
 ## C. Publishing a receipt
 
 1. The verifier constructs a Receipt V3 envelope containing terms, result, balances, evidence references, assurance, limitations, and fingerprints.
@@ -165,4 +167,3 @@ The frontend follows the same boundary: malformed or unavailable prepared record
 - [`COMPETITION_ASSURANCE_POLICY.md`](COMPETITION_ASSURANCE_POLICY.md)
 - [`TRUST_BOUNDARY.md`](TRUST_BOUNDARY.md)
 - [`FRONTEND_INTEGRATION_CONTRACT.md`](FRONTEND_INTEGRATION_CONTRACT.md)
-- [`transfer-event-ordering.md`](transfer-event-ordering.md)

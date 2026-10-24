@@ -1,6 +1,6 @@
-# Sicher Competition Submission Draft
+# Sicher historical competition record
 
-Submission field limits, required attachments, eligibility wording, and exact judging criteria are **NEEDS ORGANIZER VERIFICATION** because they are not defined in this repository.
+This document preserves the repository's historical competition/submission material. Some content was prepared for submission or judging and may not reproduce the exact final submitted form. The repository does not establish the final form fields, attachments, team entries, eligibility wording, judging criteria, or organizer verification, so those values remain historically uncertain rather than being reconstructed.
 
 ## Project
 
@@ -66,7 +66,7 @@ Historical evaluation and receipts are off-chain. Sicher does not claim that blo
 - Validated Receipt V3 records.
 - `PROVEN` / `NOT_PROVEN` when sufficient evidence exists.
 - Safe checking and delayed states when no validated result is available.
-- Automatic off-browser processing and protected publication infrastructure.
+- The automatic off-browser processing and protected publication infrastructure described in the competition preparation material.
 - Runtime result discovery without a frontend rebuild.
 - Public, wallet-free review of commitments and results.
 
@@ -123,7 +123,7 @@ This is a possible future business model. Sicher does not currently charge money
 
 ## Demonstration
 
-The recommended demo follows the product story rather than the architecture:
+The prepared demo order followed the product story rather than the architecture:
 
 1. Explain why a final wallet snapshot can hide a temporary breach.
 2. Open Commitment #2 and show the 80,000 STEST promise.
@@ -132,16 +132,22 @@ The recommended demo follows the product story rather than the architecture:
 5. Open Explore and explain terminal versus checking states.
 6. Open Make a commitment and explain pre-recording without submitting a transaction.
 
-See [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
+The prepared presentation was approximately 105–110 seconds and ended by returning to Commitment #2 or the Sicher mark. It used completed public records: presenters were instructed not to connect a wallet, submit a transaction, or bypass an active wallet-provider warning. `PROVEN` and `NOT_PROVEN` were presented as results, `CORROBORATED` as a separate non-exhaustive assurance level, and the on-chain commitment was kept distinct from off-chain verification and receipts.
+
+## Historical judge-facing explanation
+
+A project might voluntarily use Sicher to make exact terms inspectable before asking others to trust a financial commitment. This does not protect the wallet or prevent a breach; it makes the promise and supported outcome checkable.
+
+A block explorer or current-balance monitor answers a related but different question. A reviewer could manually reconstruct suitable historical chain data, while Sicher combines pre-agreed terms, full-interval evaluation, fail-closed handling, and a readable result and receipt. The registry supplies the pre-outcome record; the browser and verifier do not turn that record alone into proof that the promise was kept.
+
+Sicher does not custody or move funds. The current action is a user-authorized, zero-value registry transaction with no token approval, escrow, key custody, or message-signing flow. Results and Receipt V3 remain off-chain.
+
+The prepared demo trust explanation relied on public registry terms, retained evidence, digest-checked receipts, frozen implementation fingerprints, public source, and completed wallet-free records #1 and #2. It explicitly retained provider and operator limitations instead of describing the system as trustless.
 
 ## Current safety notice
 
 A MetaMask malicious-site classification affecting the production Vercel domain remains under external review. Users and judges must not bypass an active wallet warning. The demo can use completed wallet-free records and must not submit a transaction.
 
-## Team and submission administration
+## Historically unresolved submission administration
 
-- Team members: **[TBD BY SUBMITTER]**
-- Roles: **[TBD BY SUBMITTER]**
-- Relevant biography: **[TBD BY SUBMITTER]**
-- Contact details: **[TBD BY SUBMITTER]**
-- Ascend form requirements: **NEEDS ORGANIZER VERIFICATION**
+The repository does not establish the exact submitted team members, roles, biographies, contact details, Ascend form requirements, or organizer-confirmed values. No replacement values are inferred here.

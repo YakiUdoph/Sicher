@@ -61,7 +61,7 @@ Historical evaluation and receipts remain off-chain. Elysium does not eliminate 
 - Validated Receipt V3 result publication.
 - `PROVEN` and `NOT_PROVEN` terminal results when required evidence passes.
 - Scheduled, running, checking, delayed, pending, or indeterminate behavior when no safe terminal result exists.
-- Automatic off-browser processing and protected publication infrastructure.
+- Activated scheduled off-browser processing and protected publication infrastructure. Current end-to-end health is degraded and failing closed because recent runs have repeatedly stopped on finalized-head disagreement.
 
 STEST is a test token. It is not `$SICHER`, and no economic value or token utility is claimed.
 

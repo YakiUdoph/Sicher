@@ -76,7 +76,9 @@ Current V1 includes:
 - validated published results and Receipt V3 records;
 - `PROVEN` and `NOT_PROVEN` when sufficient evidence exists;
 - nonterminal checking or delayed states when a safe result is unavailable; and
-- automatic off-browser processing and protected publication infrastructure.
+- activated scheduled off-browser processing and protected publication infrastructure.
+
+The publication path is enabled, but its current end-to-end health is **degraded / failing closed**. Recent scheduled runs have repeatedly stopped safely; the latest observed failure was `Finalized head disagreement`. Activation therefore does not imply that automatic publication is currently healthy.
 
 Explore can show a real registry commitment without showing a terminal result. Existence proves that its terms were recorded; it does not prove the promise was kept.
 
@@ -205,11 +207,43 @@ A possible future business model is that organizations making recurring commitme
 
 ## Documentation
 
+Current specifications and operational records are grouped below. Documents explicitly labeled historical preserve earlier evidence or competition context; they are not current product specifications.
+
+### Product & usage
+
 - [Product requirements](docs/PRD.md)
 - [User guide](docs/USER_GUIDE.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Design](docs/DESIGN.md)
+
+### Architecture & security
+
 - [Architecture](docs/ARCHITECTURE.md)
 - [Security](docs/SECURITY.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Competition submission](docs/COMPETITION_SUBMISSION.md)
-- [Demo script](docs/DEMO_SCRIPT.md)
-- [Judge Q&A](docs/JUDGE_QA.md)
+- [Trust boundary](docs/TRUST_BOUNDARY.md)
+- [Frontend integration contract](docs/FRONTEND_INTEGRATION_CONTRACT.md)
+
+### Assurance & reproducibility
+
+- [Competition assurance policy](docs/COMPETITION_ASSURANCE_POLICY.md)
+- [Competition verifier freeze](docs/COMPETITION_VERIFIER_FREEZE.md)
+- [Reproducibility](docs/REPRODUCIBILITY.md)
+
+### Competition
+
+- [Historical competition submission record](docs/COMPETITION_SUBMISSION.md)
+
+### Maintainer status
+
+- [Current handoff](docs/PROGRESS.md)
+- [Phase 10B result publication](docs/PHASE10B_RESULT_PUBLICATION.md)
+
+### Historical assurance evidence
+
+These retained records describe earlier Phase 5/6 procedures, boundaries, and remediation evidence. They are historical evidence, not current product specifications.
+
+- [Phase 5A experiment procedure](docs/phase5a-experiment-procedure.md)
+- [Phase 6 claims boundary](docs/PHASE6_CLAIMS_BOUNDARY.md)
+- [Phase 6 external assurance](docs/PHASE6_EXTERNAL_ASSURANCE.md)
+- [Phase 6B.1 remediation](docs/PHASE6B1_REMEDIATION.md)
+- [Phase 6B.2 scalable evidence](docs/PHASE6B2_SCALABLE_EVIDENCE.md)

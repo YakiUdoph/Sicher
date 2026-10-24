@@ -61,9 +61,8 @@ test("5 image uses undistorted cover behavior and obsolete fallback is gone", ()
   assert.doesNotMatch(css, /\.hero-image-wrap img \{[^}]*animation:/);
 });
 
-test("6 obsolete Manus restoration TODO is resolved accurately", () => {
-  const todo = read("frontend/TODO.md");
-  assert.doesNotMatch(todo, /Restore the approved original Manus hero image/);
-  assert.match(todo, /final approved Sicher hero replacement/);
-  assert.match(todo, /not described as the original Manus asset/);
+test("6 approved replacement is wired directly with no obsolete asset reference", () => {
+  const source = read("frontend/src/main.jsx");
+  assert.match(source, /src="\/sicher-hero-web\.jpg"/);
+  assert.doesNotMatch(source, /Manus|original hero/i);
 });

@@ -2,6 +2,17 @@
 
 Phase 10B uses a scheduled, wallet-free GitHub Actions worker. It reads two public Elysium Testnet providers, requires an agreed finalized head, invokes the frozen Receipt V3 verifier unchanged, and publishes only validated terminal results through a protected pull request targeting `sicher-results`. The browser discovers `index.json` at runtime and independently checks content and Receipt V3 digests before presenting a verdict.
 
+## Current operational status
+
+- **Activation state:** enabled. The activation controls, result-publication infrastructure, and scheduled execution are enabled.
+- **Current operational health:** **DEGRADED / FAILING CLOSED**. Independently verified recent scheduled runs repeatedly failed closed; the latest observed failure was `Finalized head disagreement`.
+
+This means the path is activated but is not currently healthy end to end. The failure is safe with respect to verdict integrity: provider disagreement prevents publication rather than becoming a terminal result.
+
+## Historical preactivation record
+
+The remainder of this document preserves the preactivation instructions and state recorded before activation. References below to publication being disabled, the activation gate being unset, or `automation.operational=false` describe that historical stage and are not the current operational status.
+
 Publication remains disabled until the repository owner completes and verifies the manual controls below. Do not set `SICHER_RESULTS_BRANCH_PROTECTED=true` before that review.
 
 ## Required manual GitHub settings

@@ -130,5 +130,5 @@ test('verified #6/#7 fixture proves the immutable registry accepts identical ter
   const six = { hash: '0xc94cb3b425f79a291555e08396514cd4164e3495606592d0f2551a8c95dff95a', nonce: 17, terms: [ACCOUNT, STEST_ADDRESS, '80000000000000000000000', '8726278', '8729278'] };
   const seven = { hash: '0x5322d6e6069d4f446840a3862389ed273a78c8485f1ab2d5ecd384d73d5764c3', nonce: 18, terms: [...six.terms] };
   assert.notEqual(six.hash, seven.hash); assert.equal(seven.nonce, six.nonce + 1); assert.deepEqual(six.terms, seven.terms);
-  assert.match(source('docs/PHASE7D4_TRANSACTION_SAFETY.md'), /do not provide protocol-level uniqueness/i);
+  assert.match(source('docs/SECURITY.md'), /do not provide protocol-level uniqueness/i);
 });

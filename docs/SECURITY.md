@@ -74,9 +74,23 @@ Before opening the wallet request, the browser:
 
 A failure before send does not become a confirmed commitment.
 
+Future-start enforcement is a frontend safeguard, not a deployed-contract rule. Direct contract callers can create already-past ranges. Immutable testnet records #3 (blocks 3,000–3,200), #4 (3,000–5,000), and #5 (5,000–7,000) are historical examples of that limitation: they remain in the registry, have no validated terminal evidence, and are not promoted into the public result set or shown in Explore.
+
+## Fee preparation and failure categories
+
+Simulation, gas limit, and transaction pricing are separate checks: `eth_call` checks contract execution, `eth_estimateGas` estimates the execution gas limit, and fresh fee reads determine pricing. Immediately before wallet authorization, Sicher reads the latest base fee and gas price, treats the priority-fee recommendation and fee history as advisory, and calculates:
+
+`maxFeePerGas = max(gasPrice, 2 × max(latestBaseFee, predictedNextBaseFee) + priorityFee)`
+
+`eth_feeHistory.baseFeePerGas` contains one entry per requested block plus the predicted next-block entry; Sicher uses the final item. If priority-fee discovery fails, it falls back to `max(gasPrice - baseFee, 0)`, which safely permits the zero priority fee observed on Elysium. Missing or malformed fee history falls back to the freshly read base fee. Required fee data that is unavailable or malformed stops the flow before send.
+
+The UI distinguishes current-block, stale-start, simulation, gas-estimation, required-fee-discovery, and later underpriced wallet/RPC failures while retaining raw causes for diagnostics. A historical Commitment #6 attempt failed before a hash was returned because its wallet-populated maximum fee was below the current base fee; no receipt or commitment was created.
+
 ## Double-submit protection
 
 A synchronous submission guard collapses rapid duplicate actions. After a returned transaction hash, the browser stores a public-only pending record in `localStorage`, disables blind resubmission, and requires receipt/event/registry reconciliation.
+
+The pending-record allowlist is limited to schema version, chain ID, registry, transaction hash, sender, subject, token, minimum balance, start block, end block, and creation time. It contains no key, seed phrase, signature, or other wallet secret.
 
 The registry itself allows identical commitments. Browser safeguards therefore reduce accidental duplicate submission but do not provide protocol-level uniqueness across devices, cleared storage, alternate clients, direct calls, or intentionally repeated wallet authorizations.
 
@@ -85,6 +99,8 @@ The registry itself allows identical commitments. Browser safeguards therefore r
 Only wallet error code `4001` is treated as a definite user cancellation. Once `eth_sendTransaction` has been invoked, a timeout, disconnect, internal error, or malformed response without a usable hash remains an unknown outcome.
 
 The browser persists an allowlisted public attempt record and blocks immediate retry. Read-only recovery searches bounded `CommitmentCreated` evidence for the exact sender and terms. Zero matches remain unresolved; multiple matches remain ambiguous. A manual reset warns about duplicate risk.
+
+Immediately before the wallet request, the browser rechecks the selected account and chain. A mismatch stops the send and requires renewed review. These safeguards remain browser-local: another device or client, cleared storage, or a direct contract call can bypass them.
 
 ## Receipt and registry validation
 
@@ -137,6 +153,4 @@ Sicher currently runs on Elysium Testnet; it is not a production-ready financial
 
 - [`THREAT_MODEL.md`](THREAT_MODEL.md)
 - [`TRUST_BOUNDARY.md`](TRUST_BOUNDARY.md)
-- [`PHASE7D4_TRANSACTION_SAFETY.md`](PHASE7D4_TRANSACTION_SAFETY.md)
-- [`PHASE8C_RELEASE_BOUNDARY.md`](PHASE8C_RELEASE_BOUNDARY.md)
 - [`PHASE6_CLAIMS_BOUNDARY.md`](PHASE6_CLAIMS_BOUNDARY.md)

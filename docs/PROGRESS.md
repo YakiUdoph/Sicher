@@ -18,7 +18,7 @@ Canonical product scope and non-goals are in [`PRD.md`](PRD.md); architecture is
 - Historical acquisition, reconstruction, finality/assurance gates, Receipt V3 validation, and publication are off-browser concerns.
 - The frontend loads validated packaged records and supports runtime discovery of matching content-addressed results. A registry record without a matching validated receipt remains nonterminal.
 - The implemented publication worker and protected-PR/scheduler design are documented in [`PHASE10B_RESULT_PUBLICATION.md`](PHASE10B_RESULT_PUBLICATION.md).
-- Operational activation of that publication path is **UNKNOWN from this checkout**: the Phase 10B document says publication remains disabled pending owner-controlled activation, while later top-level product documents describe automatic processing/publication as current. Verify repository settings, result-store state, and deployed frontend configuration before claiming that scheduled publication is operational.
+- The publication path is activated: activation controls, result-publication infrastructure, and scheduled execution are enabled. Its current end-to-end health is **DEGRADED / FAILING CLOSED** because independently verified recent scheduled runs repeatedly failed closed; the latest observed failure was `Finalized head disagreement`.
 - The frontend implements Home, Explore, commitment detail, proof, receipt, How It Works, and Make a Commitment flows. Its existing visual and interaction conventions are recorded in [`DESIGN.md`](DESIGN.md).
 
 ## Security boundary
@@ -50,7 +50,7 @@ These are Elysium Testnet examples, not claims of customers, adoption, economic 
 - Evidence providers share upstream dependencies; correlated omission cannot be mathematically excluded.
 - Results and receipts are off-chain, and the system is not production-ready.
 - The production-domain MetaMask classification is documented as unresolved; users must not be told to bypass an active warning.
-- The runtime publication activation state cannot be verified from repository files alone.
+- Activation does not imply healthy publication. Current scheduled operation is degraded and failing closed on finalized-head disagreement.
 
 ## Do not casually reopen
 

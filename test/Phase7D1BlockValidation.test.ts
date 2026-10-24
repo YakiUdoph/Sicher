@@ -78,7 +78,7 @@ test('10 successful creation remains active and never means Proven', () => {
 });
 
 test('11 limitation documentation preserves immutable historical artifacts', () => {
-  const docs = readFileSync(resolve(ROOT, 'docs/PHASE7D1_CLIENT_VALIDATION.md'), 'utf8');
+  const docs = readFileSync(resolve(ROOT, 'docs/SECURITY.md'), 'utf8');
   assert.match(docs, /direct contract callers/i);
   assert.match(docs, /#3.*#4.*#5/s);
   assert.match(docs, /immutable/i);
