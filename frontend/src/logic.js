@@ -4,6 +4,7 @@ export function resolveRoute(pathname) {
   if (clean === '/explore') return { name: 'explore' };
   if (clean === '/start') return { name: 'start' };
   if (clean === '/about') return { name: 'about' };
+  if (clean === '/privacy') return { name: 'privacy' };
   const receipt = clean.match(/^\/proof\/([^/]+)\/receipt$/);
   if (receipt) return { name: 'receipt', id: receipt[1] };
   const proof = clean.match(/^\/proof\/([^/]+)$/);
