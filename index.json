@@ -77,6 +77,18 @@
       "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
       "receiptPath": "receipts/99801/0x4e4887e28a8370678a9a37c08a85c65450b510c0/9/4f0edc0280101a9d7e6de227427f6a41b62269f0e0bcfb68d70329b7171f70c4.json",
       "publishedAt": "2026-11-03T23:26:40.321Z"
+    },
+    "10": {
+      "chainId": "99801",
+      "registryAddress": "0x4e4887E28a8370678A9a37C08A85c65450b510c0",
+      "commitmentId": "10",
+      "receiptDigest": "3fa2be253347bc3a6f826929e590ec617daeae5e6d3518123679c8e233c51262",
+      "documentDigest": "71afb68a1fc6b09af1371f3084a5cbaf2bbab12b9e561579bf2e8d2a80fa166a",
+      "proofResult": "PROVEN",
+      "assuranceLevel": "CORROBORATED",
+      "verifierFingerprint": "681a77d7253a969c99d69f23b33bdbf87a2d026e3849e72fc6625e29e9a58379",
+      "receiptPath": "receipts/99801/0x4e4887e28a8370678a9a37c08a85c65450b510c0/10/3fa2be253347bc3a6f826929e590ec617daeae5e6d3518123679c8e233c51262.json",
+      "publishedAt": "2026-11-04T06:30:42.032Z"
     }
   }
 }
