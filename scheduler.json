@@ -1,13 +1,13 @@
 {
   "schemaVersion": "sicher.result-scheduler/1.0",
-  "cursorAfterId": "5",
+  "cursorAfterId": "3",
   "failures": {
     "3": {
-      "attempts": 4,
+      "attempts": 5,
       "classification": "UNRESOLVED",
       "code": "REPEATED_VERIFICATION_FAILURE",
-      "lastAttemptAt": "2026-11-13T19:46:37.354Z",
-      "nextAttemptAt": "2026-11-20T19:46:37.354Z"
+      "lastAttemptAt": "2026-11-20T20:26:08.951Z",
+      "nextAttemptAt": "2026-11-27T20:26:08.951Z"
     },
     "4": {
       "attempts": 4,
